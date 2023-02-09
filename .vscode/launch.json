@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Product Graph",
+      "cargo": {
+        "args": ["build"]
+      }
+      // "env": {
+      // "STORE_PRODUCT_URL": "http://localhost:8081",
+      // "STORE_INVENTORY_URL": "http://localhost:8082",
+      // "RETRIEVE_PRODUCT_URL": "http://localhost:8181",
+      // "RETRIEVE_INVENTORY_URL": "http://localhost:8182"
+      // }
+    }
+  ]
+}
