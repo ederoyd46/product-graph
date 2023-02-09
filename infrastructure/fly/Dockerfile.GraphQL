@@ -1,0 +1,6 @@
+FROM alpine:3 AS runner
+COPY /target/x86_64-unknown-linux-musl/release/local_graphql /bin
+
+EXPOSE 8080
+
+ENTRYPOINT [ "/bin/local_graphql" ]
