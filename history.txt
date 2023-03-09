@@ -1,0 +1,28 @@
+#V2
+hwlp
+help
+select * from product;
+select * from products;
+select * from product;
+select * from price;
+tables;
+tables
+show tables
+info for test;
+info for test
+select
+exit
+select * from products;
+select * from product;
+desc
+desc product
+desc products
+info for db test
+info for test
+info for kv
+use test
+use db test
+info
+info db test
+info for db;
+info for ns;

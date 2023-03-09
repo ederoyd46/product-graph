@@ -1,20 +1,40 @@
-use juniper::{EmptyMutation, FieldResult};
+use juniper::FieldResult;
 use juniper::{EmptySubscription, RootNode};
 
-mod price;
-mod product;
-use product::Product;
+mod new_inventory;
+mod new_price;
+mod new_product;
+
+pub use new_inventory::NewInventory;
+pub use new_price::NewPrice;
+pub use new_product::NewProduct;
+
+mod view_price;
+mod view_product;
+
+use view_price::ViewPrice;
+use view_product::ViewProduct;
+
+use crate::types::ApplicationContext;
+
+impl juniper::Context for ApplicationContext {}
+
+use crate::services::product::create_product;
 
 pub struct QueryRoot;
 
-#[juniper::graphql_object]
+#[juniper::graphql_object(Context = ApplicationContext)]
 impl QueryRoot {
-    async fn view_product(key: String) -> FieldResult<Product> {
-        Ok(Product {
+    async fn view_product(
+        &self,
+        key: String,
+        _context: &'a ApplicationContext,
+    ) -> FieldResult<ViewProduct> {
+        Ok(ViewProduct {
             key,
             name: "test".to_string(),
             description: Some("test".to_string()),
-            price: Some(price::Price {
+            price: Some(ViewPrice {
                 amount: 1.0,
                 currency_code: "EUR".to_string(),
             }),
@@ -22,11 +42,20 @@ impl QueryRoot {
     }
 }
 
-// pub struct MutationRoot;
+pub struct MutationRoot;
 
-// #[juniper::graphql_object]
-// impl MutationRoot {
-// async fn create_product(new_product: NewProduct) -> FieldResult<Product> {
+#[juniper::graphql_object(Context = ApplicationContext)]
+impl MutationRoot {
+    async fn create_product<'a>(
+        &self,
+        context: &'a ApplicationContext,
+        new_product: NewProduct,
+    ) -> FieldResult<String> {
+        log::info!("Creating product: {:?}", new_product);
+        create_product(context, new_product).await?;
+        Ok("test".to_string())
+    }
+}
 //     let store_product_url =
 //         env::var("STORE_PRODUCT_URL").expect("STORE_PRODUCT_URL must be set");
 
@@ -54,12 +83,8 @@ impl QueryRoot {
 // }
 // }
 
-pub type Schema = RootNode<'static, QueryRoot, EmptyMutation, EmptySubscription>;
+pub type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<ApplicationContext>>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(
-        QueryRoot {},
-        EmptyMutation::default(),
-        EmptySubscription::default(),
-    )
+    Schema::new(QueryRoot {}, MutationRoot {}, EmptySubscription::default())
 }

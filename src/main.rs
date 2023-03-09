@@ -1,7 +1,7 @@
 use std::{
     io,
     sync::Arc,
-    time::{Duration, Instant},
+    // time::{Duration, Instant},
 };
 
 use actix_cors::Cors;
@@ -14,48 +14,56 @@ use actix_web::{
 use juniper::futures::FutureExt;
 use juniper::http::GraphQLRequest;
 use product_graph::schema::{create_schema, Schema};
-use tokio::time::sleep;
+use product_graph::types::{ApplicationContext, ApplicationContextBuilder};
+
+// use tokio::time::sleep;
 
 /// GraphQL endpoint
 #[route("/", method = "GET", method = "POST")]
-async fn graphql(schema: web::Data<Schema>, data: web::Json<GraphQLRequest>) -> impl Responder {
-    let response_data = data.execute(&schema, &()).await;
+async fn graphql(
+    schema: web::Data<Schema>,
+    context: web::Data<ApplicationContext>,
+    data: web::Json<GraphQLRequest>,
+) -> impl Responder {
+    let response_data = data.execute(&schema, &context).await;
     HttpResponse::Ok().json(response_data)
 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    let last_activity: Arc<Instant> = Arc::new(Instant::now());
 
     // Create Juniper schema
     let schema = Arc::new(create_schema());
+    // Build the context
+    let context = Arc::new(ApplicationContextBuilder::default().build());
 
     log::info!("starting HTTP server on port 8080 ...");
-
-    tokio::spawn(async move {
-        loop {
-            let idle_time = last_activity.elapsed();
-            println!("Idle for {idle_time:?}");
-            if idle_time > Duration::from_secs(60) {
-                println!("Stopping machine. Goodbye!");
-                std::process::exit(0)
-            }
-            sleep(Duration::from_secs(20)).await;
-        }
-    });
+    // tokio::spawn(async move {
+    //     let last_activity = Instant::now();
+    //     loop {
+    //         let idle_time = last_activity.clone().elapsed();
+    //         println!("Idle for {idle_time:?}");
+    //         if idle_time > Duration::from_secs(60) {
+    //             println!("Stopping machine. Goodbye!");
+    //             std::process::exit(0)
+    //         }
+    //         sleep(Duration::from_secs(20)).await;
+    //     }
+    // });
 
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
             .app_data(Data::from(schema.clone()))
+            .app_data(Data::from(context.clone()))
             .wrap_fn(|req, srv| {
                 if let Some(ip) = req.headers().get("x-forwarded-for") {
-                    println!("IP: {}", ip.to_str().unwrap())
+                    log::info!("IP: {}", ip.to_str().unwrap());
                 }
-                // Arc::new(last_activity).store(Instant::now(), std::sync::atomic::Ordering::Relaxed);
+
                 srv.call(req).map(|res| {
-                    println!("Hi from response");
+                    log::info!("Hi from response {}", res.as_ref().unwrap().status());
                     res
                 })
             })

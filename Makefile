@@ -14,6 +14,9 @@ CURRENT_TAG_VERSION=$(shell git log --format="%h" -n 1)
 build: 
 	@cargo build 
 
+run: 
+	@cargo run
+
 test:
 	@cargo test
 
