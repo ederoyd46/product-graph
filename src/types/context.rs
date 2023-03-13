@@ -106,39 +106,3 @@ impl DatabaseContext {
 pub struct ApplicationContext {
     pub database: DatabaseContext,
 }
-
-// impl ApplicationContext {
-//     pub fn new(
-//         database_url: String,
-//         database_username: String,
-//         database_password: String,
-//     ) -> ApplicationContext {
-//         ApplicationContext {
-//             database_url,
-//             database_username,
-//             database_password,
-//         }
-//     }
-
-//     pub fn get_database_url(&self) -> &str {
-//         &self.database_url
-//     }
-
-//     pub fn get_database_username(&self) -> &str {
-//         &self.database_username
-//     }
-
-//     pub fn get_database_password(&self) -> &str {
-//         &self.database_password
-//     }
-// }
-
-// impl Default for ApplicationContext {
-//     fn default() -> Self {
-//         Self {
-//             database_url: "".to_string(),
-//             database_username: "".to_string(),
-//             database_password: "".to_string(),
-//         }
-//     }
-// }

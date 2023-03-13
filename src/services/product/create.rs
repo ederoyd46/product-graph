@@ -10,17 +10,59 @@ pub async fn create_product(
     let product: Product = new_product.clone().into();
     // let prices: Vec<Price> = new_product.clone().into();
 
+    let mut statements: Vec<String> = vec![];
+    statements.push("begin transaction;".to_string());
+    statements.push(format!(
+        "create product:`{}` content {};",
+        new_product.key,
+        serde_json::to_string(&product).unwrap()
+    ));
+
+    // if new_product.price.is_some() {
+    //     let prices: Vec<Price> = new_product.into();
+    //     statements.push(format!(
+    //         "create price set values={};",
+    //         serde_json::to_string(&prices).unwrap()
+    //     ));
+    // }
+    if new_product.price.is_some() {
+        let prices: Vec<Price> = new_product.clone().into();
+        for price in prices {
+            statements.push(format!(
+                "create price:`{}:{}` content {};",
+                product.key,
+                price.currency(),
+                serde_json::to_string(&price).unwrap()
+            ));
+        }
+    }
+
+    statements.push("commit transaction;".to_string());
+
+    // info!("{}", sql);
+
     let product_response = context
         .database
-        .reqwest_builder(
-            reqwest::Method::POST,
-            format!("key/product/{}", new_product.key),
-        )
-        .json(&product)
+        .reqwest_builder(reqwest::Method::POST, "sql".to_string())
+        .body(statements.concat())
         .send()
         .await?;
 
-    info!("Product response: {:?}", product_response);
+    info!("{:?}", product_response.text().await);
+    // let product_response = context
+    //     .database
+    //     .reqwest_builder(
+    //         reqwest::Method::POST,
+    //         format!("key/product/{}", new_product.key),
+    //     )
+    //     .json(&product)
+    //     .send()
+    //     .await?;
+
+    // info!(
+    //     "Product response: {:?}",
+    //     product_response.json::<Product>().await
+    // );
 
     // let price_response = context
     //     .database
