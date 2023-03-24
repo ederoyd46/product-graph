@@ -56,32 +56,6 @@ impl MutationRoot {
         Ok("test".to_string())
     }
 }
-//     let store_product_url =
-//         env::var("STORE_PRODUCT_URL").expect("STORE_PRODUCT_URL must be set");
-
-//     let product = Product::from(new_product);
-//     let product_model: ProductModel = product.try_into().expect("count not be converted");
-
-//     let response = reqwest::Client::new()
-//         .post(store_product_url)
-//         .json(&product_model)
-//         .send()
-//         .await;
-
-//     match response {
-//         Ok(response) => Ok(Product::from(
-//             response
-//                 .json::<ProductModel>()
-//                 .await
-//                 .expect("Failed to parse response"),
-//         )),
-//         Err(error) => Err(juniper::FieldError::new(
-//             "Error retrieving product",
-//             juniper::Value::scalar(error.to_string()),
-//         )),
-//     }
-// }
-// }
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<ApplicationContext>>;
 

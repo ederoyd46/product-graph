@@ -84,7 +84,7 @@ impl DatabaseContext {
             self.database_name
         )
     }
-    pub fn reqwest_builder(&self, method: reqwest::Method, extension: String) -> RequestBuilder {
+    pub fn reqwest_builder(&self, method: reqwest::Method, extension: &str) -> RequestBuilder {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             "NS",

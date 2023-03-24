@@ -36,3 +36,9 @@ build.fly.image: release
 deploy.fly.image:
 	@docker push registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION)
 	@flyctl deploy -c ./infrastructure/fly/fly.toml -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
+
+start.db:
+	surreal start -u root -p root -- file://./data
+
+connect.db:
+	surreal sql -c http://localhost:8000 -u root -p root --ns test --db test --pretty

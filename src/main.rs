@@ -1,8 +1,4 @@
-use std::{
-    io,
-    sync::Arc,
-    // time::{Duration, Instant},
-};
+use std::{io, sync::Arc};
 
 use actix_cors::Cors;
 use actix_web::{
@@ -39,18 +35,6 @@ async fn main() -> io::Result<()> {
     let context = Arc::new(ApplicationContextBuilder::default().build());
 
     log::info!("starting HTTP server on port 8080 ...");
-    // tokio::spawn(async move {
-    //     let last_activity = Instant::now();
-    //     loop {
-    //         let idle_time = last_activity.clone().elapsed();
-    //         println!("Idle for {idle_time:?}");
-    //         if idle_time > Duration::from_secs(60) {
-    //             println!("Stopping machine. Goodbye!");
-    //             std::process::exit(0)
-    //         }
-    //         sleep(Duration::from_secs(20)).await;
-    //     }
-    // });
 
     // Start HTTP server
     HttpServer::new(move || {
@@ -67,12 +51,25 @@ async fn main() -> io::Result<()> {
                     res
                 })
             })
-            .service(graphql)
             .wrap(Cors::permissive()) //If you want to use Apollo Studio you need this
             .wrap(middleware::Logger::default())
+            .service(graphql)
     })
     .workers(2)
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }
+
+// tokio::spawn(async move {
+//     let last_activity = Instant::now();
+//     loop {
+//         let idle_time = last_activity.clone().elapsed();
+//         println!("Idle for {idle_time:?}");
+//         if idle_time > Duration::from_secs(60) {
+//             println!("Stopping machine. Goodbye!");
+//             std::process::exit(0)
+//         }
+//         sleep(Duration::from_secs(20)).await;
+//     }
+// });
