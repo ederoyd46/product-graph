@@ -1,3 +1,3 @@
-mod create;
+mod mutate;
 pub mod types;
-pub use create::create_product;
+pub use mutate::mutate_product;

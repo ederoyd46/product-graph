@@ -4,7 +4,9 @@ use crate::schema::{NewPrice, NewProduct};
 use crate::services::product::types::{Price, Product};
 use crate::types::{ApplicationContext, ApplicationError};
 
-pub async fn create_product(
+// select *, price[where currency='GBP'] from product fetch price;
+
+pub async fn mutate_product(
     context: &ApplicationContext,
     new_product: NewProduct,
 ) -> Result<(), ApplicationError> {
@@ -17,7 +19,7 @@ pub async fn create_product(
         let prices: Vec<Price> = new_product.clone().into();
         for price in prices {
             statements.push(format!(
-                "create price:`{}:{}` content {}",
+                "update price:`{}:{}` content {}",
                 product.key(),
                 price.currency(),
                 serde_json::to_string(&price).unwrap()
@@ -26,7 +28,7 @@ pub async fn create_product(
     }
 
     statements.push(format!(
-        "create product:`{}` content {}",
+        "update product:`{}` content {}",
         new_product.key,
         serde_json::to_string(&product).unwrap(),
     ));
@@ -72,7 +74,9 @@ impl From<NewProduct> for Vec<Price> {
         match new_product.price {
             Some(prices) => prices
                 .into_iter()
-                .map(|new_price| Price::new(new_price.currency, new_price.amount))
+                .map(|new_price| {
+                    Price::new(new_price.currency, new_price.country, new_price.amount)
+                })
                 .collect(),
             None => vec![],
         }
@@ -80,6 +84,6 @@ impl From<NewProduct> for Vec<Price> {
 }
 impl From<NewPrice> for Price {
     fn from(new_price: NewPrice) -> Self {
-        Self::new(new_price.currency, new_price.amount)
+        Self::new(new_price.currency, new_price.country, new_price.amount)
     }
 }

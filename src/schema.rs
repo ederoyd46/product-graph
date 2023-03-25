@@ -19,7 +19,7 @@ use crate::types::ApplicationContext;
 
 impl juniper::Context for ApplicationContext {}
 
-use crate::services::product::create_product;
+use crate::services::product::mutate_product;
 
 pub struct QueryRoot;
 
@@ -46,13 +46,13 @@ pub struct MutationRoot;
 
 #[juniper::graphql_object(Context = ApplicationContext)]
 impl MutationRoot {
-    async fn create_product<'a>(
+    async fn product<'a>(
         &self,
         context: &'a ApplicationContext,
         new_product: NewProduct,
     ) -> FieldResult<String> {
-        log::info!("Creating product: {:?}", new_product);
-        create_product(context, new_product).await?;
+        log::info!("Mutating product: {:?}", new_product);
+        mutate_product(context, new_product).await?;
         Ok("test".to_string())
     }
 }
