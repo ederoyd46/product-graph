@@ -40,5 +40,8 @@ deploy.fly.image:
 start.db:
 	surreal start -u root -p root -- file://./data
 
+start.mem.db:
+	surreal start -u root -p root
+
 connect.db:
 	surreal sql -c http://localhost:8000 -u root -p root --ns test --db test --pretty

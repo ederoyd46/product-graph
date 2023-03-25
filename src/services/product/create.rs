@@ -10,14 +10,14 @@ pub async fn create_product(
     let product = Product::from(new_product.clone());
 
     let mut statements: Vec<String> = vec![];
-    statements.push("begin transaction;".to_string());
+    statements.push("begin transaction".to_string());
 
     if new_product.price.is_some() {
         let prices: Vec<Price> = new_product.clone().into();
         for price in prices {
             statements.push(format!(
-                "create price:`{}:{}` content {};",
-                product.key,
+                "create price:`{}:{}` content {}",
+                product.key(),
                 price.currency(),
                 serde_json::to_string(&price).unwrap()
             ));
@@ -25,37 +25,39 @@ pub async fn create_product(
     }
 
     statements.push(format!(
-        "create product:`{}` content {};",
+        "create product:`{}` content {}",
         new_product.key,
-        serde_json::to_string(&product).unwrap()
+        serde_json::to_string(&product).unwrap(),
     ));
 
     statements.push("commit transaction;".to_string());
 
-    info!("{}", statements.join(","));
+    info!("REQUEST {:?}", statements);
 
     let product_response = context
         .database
         .reqwest_builder(reqwest::Method::POST, "sql")
-        .body(statements.concat())
+        .body(statements.join(";"))
         .send()
         .await?;
 
-    info!("{:?}", product_response.text().await);
+    info!("RESPONSE: {:?}", product_response.text().await);
     Ok(())
 }
 
 impl From<NewProduct> for Product {
     fn from(new_product: NewProduct) -> Self {
         Self::new(
-            new_product.key,
+            new_product.key.clone(),
             new_product.name,
             new_product.description,
             match { new_product.price } {
                 Some(prices) => Some(
                     prices
                         .into_iter()
-                        .map(|new_price| Price::from(new_price))
+                        .map(|new_price| {
+                            format!("price:`{}:{}`", new_product.key, new_price.currency)
+                        })
                         .collect(),
                 ),
                 None => None,
