@@ -5,7 +5,7 @@ pub struct Product {
     key: String,
     name: String,
     description: Option<String>,
-    price_keys: Option<Vec<String>>,
+    price: Option<Vec<String>>,
 }
 
 impl Product {
@@ -13,13 +13,13 @@ impl Product {
         key: String,
         name: String,
         description: Option<String>,
-        price_keys: Option<Vec<String>>,
+        price: Option<Vec<String>>,
     ) -> Self {
         Self {
             key,
             name,
             description,
-            price_keys,
+            price,
         }
     }
 
@@ -35,9 +35,9 @@ impl Product {
         self.description.as_deref()
     }
 
-    pub fn price_keys(&self) -> Vec<String> {
-        match &self.price_keys {
-            Some(price_keys) => price_keys.clone(),
+    pub fn price(&self) -> Vec<String> {
+        match &self.price {
+            Some(price) => price.clone(),
             None => vec![],
         }
     }
@@ -49,7 +49,7 @@ impl Default for Product {
             key: "".to_string(),
             name: "".to_string(),
             description: None,
-            price_keys: None,
+            price: None,
         }
     }
 }

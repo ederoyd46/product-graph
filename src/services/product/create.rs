@@ -1,7 +1,8 @@
 use log::info;
 
 use crate::schema::{NewPrice, NewProduct};
-use crate::types::{ApplicationContext, ApplicationError, Price, Product};
+use crate::services::product::types::{Price, Product};
+use crate::types::{ApplicationContext, ApplicationError};
 
 pub async fn create_product(
     context: &ApplicationContext,
