@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 
 use crate::schema::{NewPrice, NewProduct};
 use crate::services::product::types::{Price, Product};
@@ -33,7 +33,7 @@ pub async fn create_product(
 
     statements.push("commit transaction;".to_string());
 
-    info!("REQUEST {:?}", statements);
+    debug!("REQUEST {:?}", statements);
 
     let product_response = context
         .database
@@ -42,7 +42,7 @@ pub async fn create_product(
         .send()
         .await?;
 
-    info!("RESPONSE: {:?}", product_response.text().await);
+    debug!("RESPONSE: {:?}", product_response.text().await);
     Ok(())
 }
 
