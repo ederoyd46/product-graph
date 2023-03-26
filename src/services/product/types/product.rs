@@ -1,11 +1,19 @@
 use serde_derive::{Deserialize, Serialize};
 
+use crate::types::Storable;
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Product {
     key: String,
     name: String,
     description: Option<String>,
     price: Option<Vec<String>>,
+}
+
+impl Storable for Product {
+    fn db_key(&self) -> String {
+        format!("product:`{}`", self.key)
+    }
 }
 
 impl Product {
