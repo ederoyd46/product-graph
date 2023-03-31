@@ -31,10 +31,10 @@ create.fly.app:
 	@fly apps create --name ederoyd-product-graph
 	@fly auth docker
 
-build.fly.image: release
-	@docker build -f ./infrastructure/fly/Dockerfile.GraphQL --tag registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) .
+build.fly.image:
+	@docker buildx build --platform linux/amd64 -f ./infrastructure/fly/Dockerfile.GraphQL --tag registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) .
 
-deploy.fly.image: build.fly.image
+deploy.fly.image:
 	@docker push registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION)
 	@flyctl deploy -c ./infrastructure/fly/fly.toml -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
 
