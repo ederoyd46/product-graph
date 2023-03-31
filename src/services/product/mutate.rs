@@ -1,6 +1,6 @@
 use log::debug;
 
-use crate::schema::NewProduct;
+use crate::services::graph::schema::NewProduct;
 use crate::services::product::build_mutate_statement;
 use crate::services::product::types::{Price, Product};
 use crate::types::{ApplicationContext, ApplicationError, Storable};
