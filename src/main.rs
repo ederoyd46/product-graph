@@ -5,12 +5,13 @@ use actix_web::{
     dev::Service as _,
     middleware, route,
     web::{self, Data},
-    App, HttpResponse, HttpServer, Responder,
+    App, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use juniper::futures::FutureExt;
 use juniper::http::GraphQLRequest;
 use product_graph::schema::{create_schema, Schema};
 use product_graph::types::{ApplicationContext, ApplicationContextBuilder};
+use serde_json::{json, Value};
 
 // use tokio::time::sleep;
 
@@ -23,6 +24,18 @@ async fn graphql(
 ) -> impl Responder {
     let response_data = data.execute(&schema, &context).await;
     HttpResponse::Ok().json(response_data)
+}
+
+/// Echo endpoint
+#[route("/echo", method = "GET", method = "POST")]
+async fn echo(request: HttpRequest, data: web::Json<Value>) -> impl Responder {
+    log::info!("Request: {:?}", request);
+    log::info!("Data: {:?}", data);
+
+    HttpResponse::Ok().json(json!({
+      "success": true,
+      "data": {},
+    }))
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -54,6 +67,7 @@ async fn main() -> io::Result<()> {
             .wrap(Cors::permissive()) //If you want to use Apollo Studio you need this
             .wrap(middleware::Logger::default())
             .service(graphql)
+            .service(echo)
     })
     .workers(2)
     .bind(("0.0.0.0", 8080))?

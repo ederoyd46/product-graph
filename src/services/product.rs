@@ -1,4 +1,5 @@
 mod mutate;
+mod query;
 pub mod types;
 pub use mutate::mutate_product;
 use serde::Serialize;
