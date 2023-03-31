@@ -18,7 +18,6 @@ async fn main() -> io::Result<()> {
                 if let Some(ip) = req.headers().get("x-forwarded-for") {
                     log::info!("IP: {}", ip.to_str().unwrap());
                 }
-
                 srv.call(req).map(|res| {
                     log::info!("Hi from response {}", res.as_ref().unwrap().status());
                     res

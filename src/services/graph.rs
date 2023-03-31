@@ -9,7 +9,7 @@ use schema::Schema;
 use actix_web::{
     route,
     web::{self, Data},
-    HttpResponse, Responder,
+    App, HttpResponse, Responder,
 };
 
 use self::schema::create_schema;
@@ -33,5 +33,6 @@ pub fn setup(config: &mut web::ServiceConfig) {
 
     config
         .app_data(Data::from(schema.clone()))
-        .app_data(Data::from(context.clone()));
+        .app_data(Data::from(context.clone()))
+        .service(service);
 }
