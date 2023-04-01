@@ -9,7 +9,7 @@ use schema::Schema;
 use actix_web::{
     route,
     web::{self, Data},
-    App, HttpResponse, Responder,
+    HttpResponse, Responder,
 };
 
 use self::schema::create_schema;

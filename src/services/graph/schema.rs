@@ -12,33 +12,26 @@ pub use new_product::NewProduct;
 mod view_price;
 mod view_product;
 
-use view_price::ViewPrice;
-use view_product::ViewProduct;
+pub use view_price::ViewPrice;
+pub use view_product::ViewProduct;
 
 use crate::types::ApplicationContext;
 
 impl juniper::Context for ApplicationContext {}
 
-use crate::services::product::mutate_product;
+use crate::services::product::{mutate_product, query_product};
 
 pub struct QueryRoot;
 
 #[juniper::graphql_object(Context = ApplicationContext)]
 impl QueryRoot {
-    async fn view_product(
+    async fn product(
         &self,
         key: String,
-        _context: &'a ApplicationContext,
+        context: &'a ApplicationContext,
     ) -> FieldResult<ViewProduct> {
-        Ok(ViewProduct {
-            key,
-            name: "test".to_string(),
-            description: Some("test".to_string()),
-            price: Some(ViewPrice {
-                amount: 1.0,
-                currency_code: "EUR".to_string(),
-            }),
-        })
+        let result = query_product(context, key).await?;
+        Ok(result)
     }
 }
 
