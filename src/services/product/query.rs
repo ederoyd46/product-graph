@@ -7,7 +7,7 @@ use super::types::{Product, ProductQueryResults, QueryResult};
 
 pub async fn query_product(
     context: &ApplicationContext,
-    key: String,
+    key: &str,
 ) -> Result<ViewProduct, ApplicationError> {
     let product_response = context
         .database

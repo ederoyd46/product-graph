@@ -30,7 +30,7 @@ impl QueryRoot {
         key: String,
         context: &'a ApplicationContext,
     ) -> FieldResult<ViewProduct> {
-        let result = query_product(context, key).await?;
+        let result = query_product(context, &key).await?;
         Ok(result)
     }
 }
