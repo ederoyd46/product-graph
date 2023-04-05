@@ -1,38 +1,35 @@
-# fly.toml file generated for ederoyd-product-graph on 2023-03-31T15:54:58+01:00
+# fly.toml file generated for ederoyd-product-graph on 2023-04-02T09:54:50+01:00
 
 app = "ederoyd-product-graph"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
 [processes]
-  graph = "/bin/product-graph"
   db = "/bin/surreal start -u root -p root"
+  graph = "/bin/product-graph"
 
 [[services]]
-  processes = ["graph"]
   protocol = "tcp"
   internal_port = 8080
+  processes = ["graph"]
 
   [[services.ports]]
     port = 80
     handlers = ["http"]
-
   [services.concurrency]
     type = "connections"
     hard_limit = 25
     soft_limit = 20
 
 [[services]]
-  processes = ["db"]
   protocol = "tcp"
   internal_port = 8000
+  processes = ["db"]
 
   [[services.ports]]
     port = 8000
     handlers = ["http"]
-
   [services.concurrency]
     type = "connections"
     hard_limit = 25
     soft_limit = 20
-

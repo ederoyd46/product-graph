@@ -1,3 +1,5 @@
+use crate::services::product::types::Product;
+
 use super::view_price::ViewPrice;
 
 // #[derive(GraphQLObject, Debug, Clone)]
@@ -14,5 +16,16 @@ pub struct ViewProduct {
 impl ViewProduct {
     pub fn get_info(&self) -> String {
         format!("{}: {}", self.key, self.name)
+    }
+}
+
+impl From<Product> for ViewProduct {
+    fn from(product: Product) -> Self {
+        Self {
+            key: product.key().to_string(),
+            name: product.name().to_string(),
+            description: None,
+            price: None,
+        }
     }
 }

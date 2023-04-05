@@ -1,14 +1,11 @@
-use crate::{
-    services::graph::schema::ViewProduct,
-    types::{ApplicationContext, ApplicationError},
-};
+use crate::types::{ApplicationContext, ApplicationError};
 
 use super::types::{Product, ProductQueryResults, QueryResult};
 
 pub async fn query_product(
     context: &ApplicationContext,
     key: &str,
-) -> Result<ViewProduct, ApplicationError> {
+) -> Result<Product, ApplicationError> {
     let product_response = context
         .database
         .reqwest_builder(
@@ -23,27 +20,16 @@ pub async fn query_product(
     Ok(results.into())
 }
 
-impl From<&Product> for ViewProduct {
-    fn from(product: &Product) -> Self {
-        Self {
-            key: product.key().to_string(),
-            name: product.name().to_string(),
-            description: None,
-            price: None,
-        }
-    }
-}
-
-impl From<ProductQueryResults> for ViewProduct {
+impl From<ProductQueryResults> for Product {
     fn from(results: ProductQueryResults) -> Self {
         results.iter().next().unwrap().into()
     }
 }
 
-impl From<&QueryResult<Product>> for ViewProduct {
+impl From<&QueryResult<Product>> for Product {
     fn from(result: &QueryResult<Product>) -> Self {
         let products = &result.result;
         let product = products.iter().next().unwrap();
-        return product.into();
+        product.to_owned()
     }
 }

@@ -31,7 +31,7 @@ impl QueryRoot {
         context: &'a ApplicationContext,
     ) -> FieldResult<ViewProduct> {
         let result = query_product(context, &key).await?;
-        Ok(result)
+        Ok(result.into())
     }
 }
 

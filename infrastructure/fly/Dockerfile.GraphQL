@@ -7,4 +7,4 @@ COPY /target/x86_64-unknown-linux-musl/release/product-graph /bin
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/bin/product-graph" ]
+# ENTRYPOINT [ "/bin/product-graph" ]
