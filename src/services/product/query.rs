@@ -11,9 +11,13 @@ pub async fn query_product(
             format!("key/product/{}", key).as_str(),
         )
         .send()
-        .await?;
+        .await
+        .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    let results: ProductQueryResults = product_response.json().await?;
+    let results: ProductQueryResults = product_response
+        .json()
+        .await
+        .map_err(|e| ApplicationError::new(e.to_string()))?;
 
     Ok(results.into())
 }

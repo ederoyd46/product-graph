@@ -1,14 +1,16 @@
 use log::debug;
 
 use crate::services::product::build_mutate_statement;
-use crate::types::{ApplicationContext, ApplicationError, NewProduct, Price, Product};
+use crate::types::{
+    ApplicationContext, ApplicationError, NewProduct, Price, Product, ProductQueryResults,
+};
 
 // select *, price[where currency='GBP'] from product fetch price;
 
 pub async fn mutate_product(
     context: &ApplicationContext,
     new_product: NewProduct,
-) -> Result<(), ApplicationError> {
+) -> Result<Product, ApplicationError> {
     let product = Product::from(new_product.clone());
 
     let mut statements: Vec<String> = vec![];
@@ -31,8 +33,15 @@ pub async fn mutate_product(
         .reqwest_builder(reqwest::Method::POST, "sql")
         .body(statements.join(";"))
         .send()
-        .await?;
+        .await
+        .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    debug!("RESPONSE: {:?}", product_response.text().await);
-    Ok(())
+    let results: ProductQueryResults = product_response
+        .json()
+        .await
+        .map_err(|e| ApplicationError::new(e.to_string()))?;
+
+    debug!("RESPONSE {:?}", &results);
+
+    Ok(results.into())
 }
