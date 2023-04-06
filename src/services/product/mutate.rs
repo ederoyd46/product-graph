@@ -3,7 +3,7 @@ use log::debug;
 use crate::services::graph::schema::NewProduct;
 use crate::services::product::build_mutate_statement;
 use crate::services::product::types::{Price, Product};
-use crate::types::{ApplicationContext, ApplicationError, Storable};
+use crate::types::{ApplicationContext, ApplicationError};
 
 // select *, price[where currency='GBP'] from product fetch price;
 
@@ -38,45 +38,3 @@ pub async fn mutate_product(
     debug!("RESPONSE: {:?}", product_response.text().await);
     Ok(())
 }
-
-impl From<NewProduct> for Product {
-    fn from(new_product: NewProduct) -> Self {
-        let product = new_product.clone();
-        Self::new(
-            product.key,
-            product.name,
-            product.description,
-            match { product.price } {
-                Some(_) => {
-                    let prices = Vec::<Price>::from(new_product);
-                    Some(prices.into_iter().map(|price| price.db_key()).collect())
-                }
-                None => None,
-            },
-        )
-    }
-}
-
-impl From<NewProduct> for Vec<Price> {
-    fn from(new_product: NewProduct) -> Self {
-        match new_product.price {
-            Some(prices) => prices
-                .into_iter()
-                .map(|new_price| {
-                    Price::new(
-                        new_product.key.clone(),
-                        new_price.currency,
-                        new_price.country,
-                        new_price.amount,
-                    )
-                })
-                .collect(),
-            None => vec![],
-        }
-    }
-}
-// impl From<NewPrice> for Price {
-//     fn from(new_price: NewPrice) -> Self {
-//         Self::new(new_price.currency, new_price.country, new_price.amount)
-//     }
-// }
