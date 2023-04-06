@@ -1,6 +1,5 @@
 mod mutate;
 mod query;
-pub mod types;
 pub use mutate::mutate_product;
 pub use query::query_product;
 

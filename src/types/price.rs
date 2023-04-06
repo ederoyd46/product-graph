@@ -2,6 +2,8 @@ use serde_derive::{Deserialize, Serialize};
 
 use crate::types::Storable;
 
+use super::NewProduct;
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Price {
     product_key: String,
@@ -49,6 +51,25 @@ impl Default for Price {
             currency: "GBP".to_string(),
             country: "GB".to_string(),
             amount: 0.0,
+        }
+    }
+}
+
+impl From<NewProduct> for Vec<Price> {
+    fn from(new_product: NewProduct) -> Self {
+        match new_product.price {
+            Some(prices) => prices
+                .into_iter()
+                .map(|new_price| {
+                    Price::new(
+                        new_product.key.clone(),
+                        new_price.currency,
+                        new_price.country,
+                        new_price.amount,
+                    )
+                })
+                .collect(),
+            None => vec![],
         }
     }
 }

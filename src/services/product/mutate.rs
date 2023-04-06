@@ -1,9 +1,7 @@
 use log::debug;
 
-use crate::services::graph::schema::NewProduct;
 use crate::services::product::build_mutate_statement;
-use crate::services::product::types::{Price, Product};
-use crate::types::{ApplicationContext, ApplicationError};
+use crate::types::{ApplicationContext, ApplicationError, NewProduct, Price, Product};
 
 // select *, price[where currency='GBP'] from product fetch price;
 

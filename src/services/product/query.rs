@@ -1,6 +1,4 @@
-use crate::types::{ApplicationContext, ApplicationError};
-
-use super::types::{Product, ProductQueryResults};
+use crate::types::{ApplicationContext, ApplicationError, Product, ProductQueryResults};
 
 pub async fn query_product(
     context: &ApplicationContext,

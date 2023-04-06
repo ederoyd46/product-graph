@@ -1,21 +1,7 @@
 use juniper::FieldResult;
 use juniper::{EmptySubscription, RootNode};
 
-mod new_inventory;
-mod new_price;
-mod new_product;
-
-pub use new_inventory::NewInventory;
-pub use new_price::NewPrice;
-pub use new_product::NewProduct;
-
-mod view_price;
-mod view_product;
-
-pub use view_price::ViewPrice;
-pub use view_product::ViewProduct;
-
-use crate::types::ApplicationContext;
+use crate::types::{ApplicationContext, NewProduct, ViewProduct};
 
 impl juniper::Context for ApplicationContext {}
 
