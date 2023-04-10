@@ -1,9 +1,7 @@
 use log::debug;
 
 use crate::services::product::build_mutate_statement;
-use crate::types::{
-    ApplicationContext, ApplicationError, NewProduct, Price, Product, ProductQueryResults,
-};
+use crate::types::{ApplicationContext, ApplicationError, NewProduct, Price, Product};
 
 // select *, price[where currency='GBP'] from product fetch price;
 
@@ -36,12 +34,12 @@ pub async fn mutate_product(
         .await
         .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    let results: ProductQueryResults = product_response
-        .json()
-        .await
-        .map_err(|e| ApplicationError::new(e.to_string()))?;
+    debug!("RESPONSE {:?}", &product_response.text().await.unwrap());
 
-    debug!("RESPONSE {:?}", &results);
+    // let results: ProductQueryResults = product_response
+    //     .text()
+    //     .await
+    //     .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    Ok(results.into())
+    Ok(Product::from(new_product))
 }

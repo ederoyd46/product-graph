@@ -14,10 +14,9 @@ pub async fn query_product(
         .await
         .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    let results: ProductQueryResults = product_response
-        .json()
+    product_response
+        .json::<ProductQueryResults>()
         .await
-        .map_err(|e| ApplicationError::new(e.to_string()))?;
-
-    Ok(results.into())
+        .and_then(|results| Ok(Product::from(results)))
+        .map_err(|e| ApplicationError::new(e.to_string()))
 }
