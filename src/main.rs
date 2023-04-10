@@ -1,5 +1,4 @@
 use std::io;
-
 use actix_cors::Cors;
 use actix_web::{dev::Service as _, middleware, App, HttpServer};
 use juniper::futures::FutureExt;
@@ -33,16 +32,3 @@ async fn main() -> io::Result<()> {
     .run()
     .await
 }
-
-// tokio::spawn(async move {
-//     let last_activity = Instant::now();
-//     loop {
-//         let idle_time = last_activity.clone().elapsed();
-//         println!("Idle for {idle_time:?}");
-//         if idle_time > Duration::from_secs(60) {
-//             println!("Stopping machine. Goodbye!");
-//             std::process::exit(0)
-//         }
-//         sleep(Duration::from_secs(20)).await;
-//     }
-// });

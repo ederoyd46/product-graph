@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::fmt;
 
 #[derive(Debug)]
@@ -5,6 +6,8 @@ pub struct ApplicationError {
     pub kind: String,
     pub message: String,
 }
+
+impl Error for ApplicationError {}
 
 impl ApplicationError {
     pub fn new(message: String) -> Self {
