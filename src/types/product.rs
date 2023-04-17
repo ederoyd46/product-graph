@@ -66,14 +66,14 @@ impl Default for Product {
 
 impl From<ProductQueryResults> for Product {
     fn from(results: ProductQueryResults) -> Self {
-        results.iter().next().unwrap().into()
+        results.first().unwrap().into()
     }
 }
 
 impl From<&QueryResult<Product>> for Product {
     fn from(result: &QueryResult<Product>) -> Self {
         let products = &result.result;
-        let product = products.iter().next().unwrap();
+        let product = products.first().unwrap();
         product.to_owned()
     }
 }
@@ -88,7 +88,7 @@ impl From<NewProduct> for Product {
             match { product.price } {
                 Some(_) => {
                     let prices = Vec::<Price>::from(new_product);
-                    Some(prices.into_iter().map(|price| price.db_key()).collect())
+                    Some(prices.iter().map(|price| price.db_key()).collect())
                 }
                 None => None,
             },

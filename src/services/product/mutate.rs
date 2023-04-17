@@ -1,6 +1,7 @@
 use log::debug;
 
 use crate::services::product::build_mutate_statement;
+use crate::types::error::UnexpectedError;
 use crate::types::{ApplicationContext, ApplicationError, NewProduct, Price, Product};
 
 // select *, price[where currency='GBP'] from product fetch price;
@@ -32,7 +33,7 @@ pub async fn mutate_product(
         .body(statements.join(";"))
         .send()
         .await
-        .map_err(|e| ApplicationError::new(e.to_string()))?;
+        .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
 
     debug!("RESPONSE {:?}", &product_response.text().await.unwrap());
 
@@ -41,5 +42,5 @@ pub async fn mutate_product(
     //     .await
     //     .map_err(|e| ApplicationError::new(e.to_string()))?;
 
-    Ok(Product::from(new_product))
+    Ok(new_product.into())
 }

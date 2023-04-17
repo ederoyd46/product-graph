@@ -9,6 +9,12 @@ pub struct QueryResult<T> {
     pub result: Vec<T>,
 }
 
+impl<T> QueryResult<T> {
+    pub fn has_results(&self) -> bool {
+        self.result.len() > 0
+    }
+}
+
 pub type QueryResults<T> = Vec<QueryResult<T>>;
 
 pub type ProductQueryResults = QueryResults<Product>;

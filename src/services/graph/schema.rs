@@ -13,10 +13,8 @@ impl QueryRoot {
         key: String,
         context: &'a ApplicationContext,
     ) -> FieldResult<ViewProduct> {
-        query_product(context, &key)
-            .await
-            .and_then(|product| Ok(ViewProduct::from(product)))
-            .map_err(|e| e.into())
+        let found_product = query_product(context, &key).await?;
+        Ok(found_product.into())
     }
 }
 

@@ -1,4 +1,6 @@
-use crate::types::{ApplicationContext, ApplicationError, Product, ProductQueryResults};
+use crate::types::{
+    error::UnexpectedError, ApplicationContext, ApplicationError, Product, ProductQueryResults,
+};
 
 pub async fn query_product(
     context: &ApplicationContext,
@@ -12,11 +14,26 @@ pub async fn query_product(
         )
         .send()
         .await
-        .map_err(|e| ApplicationError::new(e.to_string()))?;
+        .map_err(|e| {
+            ApplicationError::Unexpected(UnexpectedError::new(
+                "Could not GET from DB".into(),
+                e.into(),
+            ))
+        })?;
 
-    product_response
+    let results = product_response
         .json::<ProductQueryResults>()
         .await
-        .and_then(|results| Ok(Product::from(results)))
-        .map_err(|e| ApplicationError::new(e.to_string()))
+        .map_err(|e| {
+            ApplicationError::Unexpected(UnexpectedError::new(
+                "Unable to parse product query results".into(),
+                e.into(),
+            ))
+        })?;
+
+    if results.len() == 0 {
+        return Err(ApplicationError::NotFound);
+    }
+
+    Ok(results.into())
 }
