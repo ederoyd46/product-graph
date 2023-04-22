@@ -11,7 +11,7 @@ pub struct QueryResult<T> {
 
 impl<T> QueryResult<T> {
     pub fn has_results(&self) -> bool {
-        self.result.len() > 0
+        !self.result.is_empty()
     }
 }
 

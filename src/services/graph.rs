@@ -33,6 +33,6 @@ pub fn setup(config: &mut web::ServiceConfig) {
 
     config
         .app_data(Data::from(schema.clone()))
-        .app_data(Data::from(context.clone()))
+        .app_data(Data::from(context))
         .service(service);
 }

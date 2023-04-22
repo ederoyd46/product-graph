@@ -31,7 +31,7 @@ pub async fn query_product(
             ))
         })?;
 
-    if results.len() == 0 {
+    if results.is_empty() {
         return Err(ApplicationError::NotFound);
     }
 
