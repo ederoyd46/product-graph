@@ -1,8 +1,11 @@
 use log::debug;
+use serde_json::Value;
 
-use crate::services::product::build_mutate_statement;
-use crate::types::error::UnexpectedError;
-use crate::types::{ApplicationContext, ApplicationError, NewProduct, Price, Product};
+use crate::services::product::{build_mutate_statement, query_product};
+use crate::types::{
+    error::UnexpectedError, ApplicationContext, ApplicationError, NewProduct, Price, Product,
+    QueryResults,
+};
 
 // select *, price[where currency='GBP'] from product fetch price;
 
@@ -27,7 +30,7 @@ pub async fn mutate_product(
 
     debug!("REQUEST {:?}", statements);
 
-    let product_response = context
+    let response = context
         .database
         .reqwest_builder(reqwest::Method::POST, "sql")
         .body(statements.join(";"))
@@ -35,12 +38,27 @@ pub async fn mutate_product(
         .await
         .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
 
-    debug!("RESPONSE {:?}", &product_response.text().await.unwrap());
+    let product_response: QueryResults<Value> = response
+        .json()
+        .await
+        .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
 
-    // let results: ProductQueryResults = product_response
-    //     .text()
-    //     .await
-    //     .map_err(|e| ApplicationError::new(e.to_string()))?;
+    debug!("RESPONSE {:?}", &product_response);
 
-    Ok(new_product.into())
+    if !is_successful(product_response) {
+        return Err(ApplicationError::InternalError(
+            "Failed to mutate product".to_string(),
+        ));
+    }
+
+    query_product(context, &new_product.key).await
+}
+
+fn is_successful(product_response: QueryResults<Value>) -> bool {
+    let success = product_response
+        .into_iter()
+        .all(|result| result.status == "OK");
+
+    debug!("SUCCESS {:?}", success);
+    success
 }

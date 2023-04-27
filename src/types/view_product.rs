@@ -5,7 +5,7 @@ use super::{view_price::ViewPrice, Product};
 pub struct ViewProduct {
     key: String,
     name: String,
-    price: Option<ViewPrice>,
+    price: Option<Vec<ViewPrice>>,
     description: Option<String>,
 }
 
@@ -20,7 +20,7 @@ impl ViewProduct {
         &self.name
     }
 
-    pub fn price(&self) -> Option<&ViewPrice> {
+    pub fn price(&self) -> Option<&Vec<ViewPrice>> {
         self.price.as_ref()
     }
 
@@ -38,8 +38,14 @@ impl From<Product> for ViewProduct {
         Self {
             key: product.key().to_string(),
             name: product.name().to_string(),
-            description: None,
-            price: None,
+            description: product.description().map(|s| s.to_string()),
+            price: Some(
+                product
+                    .price()
+                    .into_iter()
+                    .map(|p| p.into())
+                    .collect::<Vec<ViewPrice>>(),
+            ),
         }
     }
 }

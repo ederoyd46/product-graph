@@ -9,7 +9,7 @@ pub struct Product {
     key: String,
     name: String,
     description: Option<String>,
-    price: Option<Vec<String>>,
+    price: Option<Vec<Price>>,
 }
 
 impl Storable for Product {
@@ -23,7 +23,7 @@ impl Product {
         key: String,
         name: String,
         description: Option<String>,
-        price: Option<Vec<String>>,
+        price: Option<Vec<Price>>,
     ) -> Self {
         Self {
             key,
@@ -45,7 +45,7 @@ impl Product {
         self.description.as_deref()
     }
 
-    pub fn price(&self) -> Vec<String> {
+    pub fn price(&self) -> Vec<Price> {
         match &self.price {
             Some(price) => price.clone(),
             None => vec![],
@@ -71,9 +71,8 @@ impl From<ProductQueryResults> for Product {
 }
 
 impl From<&QueryResult<Product>> for Product {
-    fn from(result: &QueryResult<Product>) -> Self {
-        let products = &result.result;
-        let product = products.first().unwrap();
+    fn from(query_result: &QueryResult<Product>) -> Self {
+        let product = query_result.result.first().unwrap();
         product.to_owned()
     }
 }
@@ -85,13 +84,7 @@ impl From<NewProduct> for Product {
             product.key,
             product.name,
             product.description,
-            match { product.price } {
-                Some(_) => {
-                    let prices = Vec::<Price>::from(new_product);
-                    Some(prices.iter().map(|price| price.db_key()).collect())
-                }
-                None => None,
-            },
+            { product.price }.map(|_| Vec::<Price>::from(new_product)),
         )
     }
 }
