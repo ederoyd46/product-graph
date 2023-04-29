@@ -5,7 +5,8 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 
 [processes]
-  db = "/bin/surreal start -u root -p root"
+  # db = "/bin/surreal start -u root -p root"
+  db = "start -u root -p root"
   graph = "/bin/product-graph"
 
 [[services]]

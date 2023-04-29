@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM alpine:3 AS runner
-RUN wget -P /tmp https://github.com/surrealdb/surrealdb/releases/download/v1.0.0-beta.9/surreal-v1.0.0-beta.9.linux-amd64.tgz && \ 
-    tar zxf /tmp/surreal-v1.0.0-beta.9.linux-amd64.tgz -C /tmp && mv /tmp/surreal /bin/surreal && rm /tmp/*
+FROM surrealdb/surrealdb:latest AS runner
+# FROM alpine:3 AS runner
+# RUN wget -P /tmp https://github.com/surrealdb/surrealdb/releases/download/v1.0.0-beta.9/surreal-v1.0.0-beta.9.linux-amd64.tgz && \ 
+#     tar zxf /tmp/surreal-v1.0.0-beta.9.linux-amd64.tgz -C /tmp && mv /tmp/surreal /bin/surreal && rm /tmp/*
+# COPY /target/x86_64-unknown-linux-musl/release/product-graph /bin
 
-COPY /target/x86_64-unknown-linux-musl/release/product-graph /bin
-
+EXPOSE 8000
 EXPOSE 8080
 
 # ENTRYPOINT [ "/bin/product-graph" ]
