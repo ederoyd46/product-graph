@@ -5,9 +5,8 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 
 [processes]
-  # db = "/bin/surreal start -u root -p root"
-  # db = "start -u root -p root"
-  graph = "/bin/product-graph"
+  db = "/surreal start -u root -p root"
+  graph = "/product-graph"
 
 [[services]]
   protocol = "tcp"
@@ -22,15 +21,15 @@ kill_timeout = 5
     hard_limit = 25
     soft_limit = 20
 
-# [[services]]
-#   protocol = "tcp"
-#   internal_port = 8000
-#   processes = ["db"]
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+  processes = ["db"]
 
-#   [[services.ports]]
-#     port = 8000
-#     handlers = ["http"]
-#   [services.concurrency]
-#     type = "connections"
-#     hard_limit = 25
-#     soft_limit = 20
+  [[services.ports]]
+    port = 8000
+    handlers = ["http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
