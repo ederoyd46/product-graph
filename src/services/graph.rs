@@ -29,11 +29,7 @@ pub fn setup(config: &mut web::ServiceConfig) {
     // Create Juniper schema
     let schema = Arc::new(create_schema());
     // Build the context
-    let context = Arc::new(
-        ApplicationContextBuilder::default()
-            .with_database_url("http://ederoyd-product-graph.fly.dev:8000".to_string())
-            .build(),
-    );
+    let context = Arc::new(ApplicationContextBuilder::default().build());
 
     config
         .app_data(Data::from(schema.clone()))

@@ -1,5 +1,6 @@
 // use base64::{engine::general_purpose, Engine as _};
 use reqwest::{header, header::HeaderValue, Client, RequestBuilder};
+use std::env;
 
 pub struct ApplicationContextBuilder {
     database_url: String,
@@ -12,11 +13,11 @@ pub struct ApplicationContextBuilder {
 impl ApplicationContextBuilder {
     pub fn new() -> Self {
         Self {
-            database_url: "http://localhost:8000".to_string(),
-            database_username: "root".to_string(),
-            database_password: "root".to_string(),
-            database_namespace: "test".to_string(),
-            database_name: "test".to_string(),
+            database_url: env::var("DATABASE_URL").unwrap_or("http://localhost:8000".to_string()),
+            database_username: env::var("DATABASE_USERNAME").unwrap_or("root".to_string()),
+            database_password: env::var("DATABASE_PASSWORD").unwrap_or("root".to_string()),
+            database_namespace: env::var("DATABASE_NAMESPACE").unwrap_or("test".to_string()),
+            database_name: env::var("DATABASE_NAME").unwrap_or("test".to_string()),
         }
     }
 
