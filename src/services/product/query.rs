@@ -26,7 +26,7 @@ pub async fn query_product(
         .await
         .map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
-                "Unable to parse product query results".into(),
+                "Unable to parse product query results".to_string(),
                 e.into(),
             ))
         })?;
@@ -34,6 +34,5 @@ pub async fn query_product(
     if results.is_empty() {
         return Err(ApplicationError::NotFound);
     }
-
     Ok(results.into())
 }
