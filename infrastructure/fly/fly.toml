@@ -1,6 +1,8 @@
-# fly.toml file generated for ederoyd-product-graph on 2023-04-02T09:54:50+01:00
-
 app = "ederoyd-product-graph"
+app_description = "Ederoyd Product Graph"
+app_version = "0.0.1"
+app_license = "MIT"
+
 kill_signal = "SIGINT"
 kill_timeout = 5
 
@@ -16,6 +18,7 @@ kill_timeout = 5
   [[services.ports]]
     port = 80
     handlers = ["http"]
+    
   [services.concurrency]
     type = "connections"
     hard_limit = 25
