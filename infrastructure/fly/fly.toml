@@ -10,6 +10,9 @@ kill_timeout = 5
   db = "/surreal start -u root -p root"
   graph = "/product-graph"
 
+[env]
+  DATABASE_URL = "http://ederoyd-product-graph.fly.dev:8000"
+
 [[services]]
   protocol = "tcp"
   internal_port = 8080
