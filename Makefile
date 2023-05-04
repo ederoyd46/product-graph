@@ -30,13 +30,14 @@ endif
 create.fly.app:
 	@fly apps create --name ederoyd-product-graph
 	@fly auth docker
+	@fly ips allocate-v4 --shared
 
 build.fly.image: release
 	@docker buildx build --platform linux/amd64 -f ./infrastructure/fly/Dockerfile.GraphQL --tag registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) .
 
 deploy.fly.image: build.fly.image
 	@docker push registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION)
-	@flyctl deploy -c ./infrastructure/fly/fly.toml -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
+	@flyctl deploy -c ./infrastructure/fly/fly.toml -r lhr -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
 
 start.db:
 	surreal start -u root -p root -- file://./data

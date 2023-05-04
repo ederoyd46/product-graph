@@ -1,5 +1,7 @@
 app = "ederoyd-product-graph"
 app_description = "Ederoyd Product Graph"
+primary_region = "lhr"
+
 app_version = "0.0.1"
 app_license = "MIT"
 
@@ -33,11 +35,9 @@ kill_timeout = 5
   protocol = "tcp"
   internal_port = 8000
   processes = ["db"]
+  auto_stop_machines = true
+  auto_start_machines = true
   
-  [mounts]
-    source = "ederoyd_product_graph_db"
-    destination = "/data"
-
   [[services.ports]]
     port = 8000
     handlers = ["http"]
@@ -46,8 +46,7 @@ kill_timeout = 5
     hard_limit = 25
     soft_limit = 20
 
-# [volumes]
-#   [volumes.ederoyd-product-graph-db]
-#     size = "1GB"
-#     ephemeral = false
-
+[mounts]
+  source = "ederoyd_product_graph_db"
+  destination = "/data"
+  processes = ["db"]
