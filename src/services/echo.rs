@@ -1,7 +1,7 @@
 use actix_web::{route, web, HttpRequest, HttpResponse, Responder};
 use serde_json::{json, Value};
 
-/// Echo endpoint
+// Echo endpoint
 #[route("/echo", method = "GET", method = "POST")]
 async fn service(request: HttpRequest, data: web::Json<Value>) -> impl Responder {
     log::info!("Request: {:?}", request);
