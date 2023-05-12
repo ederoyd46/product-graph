@@ -47,3 +47,6 @@ start.mem.db:
 
 connect.db:
 	surreal sql -c http://localhost:8000 -u root -p root --ns test --db test --pretty
+
+connect.db.remote:
+	surreal sql -c http://[fdaa:0:ceb3:a7b:13d:78f:fbb:2]:8000 -u root -p root --ns test --db test --pretty

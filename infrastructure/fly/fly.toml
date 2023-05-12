@@ -5,6 +5,8 @@ primary_region = "lhr"
 app_version = "0.0.1"
 app_license = "MIT"
 
+experimental.private_network = true
+
 kill_signal = "SIGINT"
 kill_timeout = 5
 
