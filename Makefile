@@ -31,6 +31,7 @@ create.fly.app:
 	@fly apps create --name ederoyd-product-graph
 	@fly auth docker
 	@fly ips allocate-v4 --shared
+	@fly volume create ederoyd_product_graph_db --region lhr --size 3  -y
 
 build.fly.image: release
 	@docker buildx build --platform linux/amd64 -f ./infrastructure/fly/Dockerfile.GraphQL --tag registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) .
@@ -46,7 +47,7 @@ start.mem.db:
 	surreal start -u root -p root
 
 connect.db:
-	surreal sql -c http://localhost:8000 -u root -p root --ns test --db test --pretty
+	surreal sql -e http://localhost:8000 -u root -p root --ns test --db test --pretty
 
 connect.db.remote:
 	surreal sql -c http://[fdaa:0:ceb3:a7b:13d:78f:fbb:2]:8000 -u root -p root --ns test --db test --pretty
