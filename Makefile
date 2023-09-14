@@ -31,6 +31,7 @@ create.fly.app:
 	@fly apps create --name ederoyd-product-graph
 	@fly auth docker
 	@fly ips allocate-v4 --shared
+	@fly ips allocate-v6 --private #for fly cast only way to get 2 process groups to talk to each other at the moment
 	@fly volume create ederoyd_product_graph_db --region lhr --size 3  -y
 
 build.fly.image: release
@@ -50,4 +51,4 @@ connect.db:
 	surreal sql -e http://localhost:8000 -u root -p root --ns test --db test --pretty
 
 connect.db.remote:
-	surreal sql -c http://[fdaa:0:ceb3:a7b:13d:78f:fbb:2]:8000 -u root -p root --ns test --db test --pretty
+	surreal sql -e http://[fdaa:0:ceb3:a7b:bbfa:2f74:972c:2]:8000 -u root -p root --ns test --db test --pretty

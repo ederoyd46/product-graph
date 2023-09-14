@@ -15,7 +15,7 @@ kill_timeout = 5
   graph = "/product-graph"
 
 [env]
-  DATABASE_URL = "http://ederoyd-product-graph.fly.dev:8000"
+  DATABASE_URL = "http://ederoyd-product-graph.flycast:8000"
 
 [[services]]
   protocol = "tcp"
@@ -34,6 +34,7 @@ kill_timeout = 5
     soft_limit = 20
 
 [[services]]
+  # name = "ederoyd-product-graph-db"
   protocol = "tcp"
   internal_port = 8000
   processes = ["db"]
@@ -52,3 +53,4 @@ kill_timeout = 5
   source = "ederoyd_product_graph_db"
   destination = "/data"
   processes = ["db"]
+
