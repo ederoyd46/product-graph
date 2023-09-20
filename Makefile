@@ -51,4 +51,4 @@ connect.db:
 	surreal sql -e http://localhost:8000 -u root -p root --ns test --db test --pretty
 
 connect.db.remote:
-	surreal sql -e http://[fdaa:0:ceb3:a7b:bbfa:2f74:972c:2]:8000 -u root -p root --ns test --db test --pretty
+	surreal sql -e http://ederoyd-product-graph.flycast:8000 -u root -p root --ns test --db test --pretty
