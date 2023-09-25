@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::types::{
     error::UnexpectedError, ApplicationContext, ApplicationError, Product, ProductQueryResults,
 };
@@ -7,7 +9,7 @@ pub async fn query_product(
     key: &str,
 ) -> Result<Product, ApplicationError> {
     let product_response = context
-        .database
+        .database_rest
         .reqwest_builder(
             reqwest::Method::GET,
             format!("key/product/{}", key).as_str(),
@@ -34,5 +36,17 @@ pub async fn query_product(
     if results.is_empty() {
         return Err(ApplicationError::NotFound);
     }
+
+    let results_sdk: Vec<Product> = context
+        .database_sdk
+        .init_database_connection()
+        .await
+        .unwrap()
+        .select("product")
+        .await
+        .unwrap();
+
+    info!("SDK {:?}", results_sdk);
+
     Ok(results.into())
 }

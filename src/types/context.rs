@@ -1,6 +1,11 @@
+use log::info;
 // use base64::{engine::general_purpose, Engine as _};
 use reqwest::{header, header::HeaderValue, Client, RequestBuilder};
 use std::env;
+
+use surrealdb::engine::remote::ws::{Client as SClient, Ws};
+use surrealdb::opt::auth::Root;
+use surrealdb::{Error, Surreal};
 
 pub struct ApplicationContextBuilder {
     database_url: String,
@@ -47,15 +52,25 @@ impl ApplicationContextBuilder {
     }
 
     pub fn build(self) -> ApplicationContext {
-        let database_context = DatabaseContext {
-            database_url: self.database_url,
-            database_username: self.database_username,
-            database_password: self.database_password,
-            database_namespace: self.database_namespace,
-            database_name: self.database_name,
+        let database_context_rest = DatabaseRestContext {
+            database_url: self.database_url.clone(),
+            database_username: self.database_username.clone(),
+            database_password: self.database_password.clone(),
+            database_namespace: self.database_namespace.clone(),
+            database_name: self.database_name.clone(),
         };
+
+        let database_context_sdk = DatabaseSdkContext {
+            database_url: self.database_url.clone(),
+            database_username: self.database_username.clone(),
+            database_password: self.database_password.clone(),
+            database_namespace: self.database_namespace.clone(),
+            database_name: self.database_name.clone(),
+        };
+
         ApplicationContext {
-            database: database_context,
+            database_rest: database_context_rest,
+            database_sdk: database_context_sdk,
         }
     }
 }
@@ -66,7 +81,7 @@ impl Default for ApplicationContextBuilder {
     }
 }
 
-pub struct DatabaseContext {
+pub struct DatabaseRestContext {
     pub database_url: String,
     pub database_username: String,
     pub database_password: String,
@@ -74,7 +89,7 @@ pub struct DatabaseContext {
     pub database_name: String,
 }
 
-impl DatabaseContext {
+impl DatabaseRestContext {
     pub fn get_database_info(&self) -> String {
         format!(
             "Database: {}://{}:{}@{}/{}",
@@ -104,6 +119,36 @@ impl DatabaseContext {
             .headers(headers)
     }
 }
+
+pub struct DatabaseSdkContext {
+    pub database_url: String,
+    pub database_username: String,
+    pub database_password: String,
+    pub database_namespace: String,
+    pub database_name: String,
+}
+
+impl DatabaseSdkContext {
+    pub async fn init_database_connection(&self) -> Result<Surreal<SClient>, Error> {
+        let db = Surreal::new::<Ws>("localhost:8000").await?;
+        // let db = Surreal::new::<Ws>(&self.database_url).await?;
+
+        db.signin(Root {
+            username: &self.database_username,
+            password: &self.database_password,
+        })
+        .await?;
+
+        db.use_ns(&self.database_namespace)
+            .use_db(&self.database_name)
+            .await?;
+
+        info!("Connected to {}", &self.database_url);
+        Ok(db)
+    }
+}
+
 pub struct ApplicationContext {
-    pub database: DatabaseContext,
+    pub database_rest: DatabaseRestContext,
+    pub database_sdk: DatabaseSdkContext,
 }

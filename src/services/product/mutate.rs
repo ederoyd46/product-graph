@@ -31,7 +31,7 @@ pub async fn mutate_product(
     debug!("REQUEST {:?}", statements);
 
     let response = context
-        .database
+        .database_rest
         .reqwest_builder(reqwest::Method::POST, "sql")
         .body(statements.join(";"))
         .send()
