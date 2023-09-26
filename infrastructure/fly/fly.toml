@@ -15,7 +15,7 @@ kill_timeout = 5
   graph = "/product-graph"
 
 [env]
-  DATABASE_URL = "http://ederoyd-product-graph.flycast:8000"
+  DATABASE_URL = "ederoyd-product-graph.flycast:8000"
 
 [[services]]
   protocol = "tcp"
