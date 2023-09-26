@@ -1,10 +1,8 @@
 use log::debug;
-use serde_json::Value;
 
-use crate::services::product::{build_mutate_statement, query_product};
+use crate::services::product::build_mutate_statement;
 use crate::types::{
     error::UnexpectedError, ApplicationContext, ApplicationError, NewProduct, Price, Product,
-    QueryResults,
 };
 
 // select *, price[where currency='GBP'] from product fetch price;
@@ -15,8 +13,9 @@ pub async fn mutate_product(
 ) -> Result<Product, ApplicationError> {
     let product = Product::from(new_product.clone());
 
+    let db = context.database_sdk.init_database_connection().await?;
+
     let mut statements: Vec<String> = vec![];
-    statements.push("begin transaction".to_string());
 
     if new_product.price.is_some() {
         let prices: Vec<Price> = new_product.clone().into();
@@ -24,41 +23,26 @@ pub async fn mutate_product(
             statements.push(build_mutate_statement(&price));
         }
     }
-
     statements.push(build_mutate_statement(&product));
-    statements.push("commit transaction".to_string());
-
     debug!("REQUEST {:?}", statements);
 
-    let response = context
-        .database_rest
-        .reqwest_builder(reqwest::Method::POST, "sql")
-        .body(statements.join(";"))
-        .send()
+    let product_response = db
+        .query("begin transaction")
+        .query(statements.join(";"))
+        .query("commit transaction")
         .await
         .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
 
-    let product_response: QueryResults<Value> = response
-        .json()
-        .await
-        .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
+    let mut result = product_response.check().map_err(|e| {
+        ApplicationError::Unexpected(UnexpectedError::new(
+            "Could not parse product response".to_string(),
+            e.into(),
+        ))
+    })?;
 
-    debug!("RESPONSE {:?}", &product_response);
+    let product: Option<Product> = result.take(result.num_statements() - 1).unwrap();
 
-    if !is_successful(product_response) {
-        return Err(ApplicationError::InternalError(
-            "Failed to mutate product".to_string(),
-        ));
-    }
+    debug!("RESPONSE {:?}", result);
 
-    query_product(context, &new_product.key).await
-}
-
-fn is_successful(product_response: QueryResults<Value>) -> bool {
-    let success = product_response
-        .into_iter()
-        .all(|result| result.status == "OK");
-
-    debug!("SUCCESS {:?}", success);
-    success
+    Ok(product.unwrap())
 }

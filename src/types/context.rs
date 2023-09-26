@@ -1,11 +1,13 @@
-use log::info;
-// use base64::{engine::general_purpose, Engine as _};
-use reqwest::{header, header::HeaderValue, Client, RequestBuilder};
+use reqwest::{header, header::HeaderValue, Client as HttpClient, RequestBuilder};
+
 use std::env;
 
-use surrealdb::engine::remote::ws::{Client as SClient, Ws};
-use surrealdb::opt::auth::Root;
-use surrealdb::{Error, Surreal};
+use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
+use surrealdb::opt::auth::Database;
+use surrealdb::Surreal;
+
+use super::error::UnexpectedError;
+use super::ApplicationError;
 
 pub struct ApplicationContextBuilder {
     database_url: String,
@@ -113,7 +115,7 @@ impl DatabaseRestContext {
         );
         headers.insert("Accept", HeaderValue::from_str("application/json").unwrap());
 
-        Client::new()
+        HttpClient::new()
             .request(method, format!("{}/{}", self.database_url, extension))
             .basic_auth(&self.database_username, Some(&self.database_password))
             .headers(headers)
@@ -121,29 +123,50 @@ impl DatabaseRestContext {
 }
 
 pub struct DatabaseSdkContext {
-    pub database_url: String,
-    pub database_username: String,
-    pub database_password: String,
-    pub database_namespace: String,
-    pub database_name: String,
+    database_url: String,
+    database_username: String,
+    database_password: String,
+    database_namespace: String,
+    database_name: String,
 }
 
 impl DatabaseSdkContext {
-    pub async fn init_database_connection(&self) -> Result<Surreal<SClient>, Error> {
-        let db = Surreal::new::<Ws>("localhost:8000").await?;
-        // let db = Surreal::new::<Ws>(&self.database_url).await?;
+    pub fn get_database_info(&self) -> String {
+        format!(
+            "Database: {}://{}:{}@{}/{}",
+            self.database_url,
+            self.database_username,
+            self.database_password,
+            self.database_namespace,
+            self.database_name
+        )
+    }
 
-        db.signin(Root {
+    pub async fn init_database_connection(
+        &self,
+    ) -> Result<Surreal<SurrealClient>, ApplicationError> {
+        // let db = Surreal::new::<Ws>(&self.database_url).await?;
+        let db = Surreal::new::<Ws>("localhost:8000").await.map_err(|e| {
+            ApplicationError::Unexpected(UnexpectedError::new(
+                "Could not connect to the database".into(),
+                e.into(),
+            ))
+        })?;
+
+        db.signin(Database {
             username: &self.database_username,
             password: &self.database_password,
+            namespace: &self.database_namespace,
+            database: &self.database_name,
         })
-        .await?;
+        .await
+        .map_err(|e| {
+            ApplicationError::Unexpected(UnexpectedError::new(
+                "Could not sign in to data".into(),
+                e.into(),
+            ))
+        })?;
 
-        db.use_ns(&self.database_namespace)
-            .use_db(&self.database_name)
-            .await?;
-
-        info!("Connected to {}", &self.database_url);
         Ok(db)
     }
 }
