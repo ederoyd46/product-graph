@@ -146,7 +146,7 @@ impl DatabaseSdkContext {
         &self,
     ) -> Result<Surreal<SurrealClient>, ApplicationError> {
         // let db = Surreal::new::<Ws>(&self.database_url).await?;
-        let db = Surreal::new::<Ws>("localhost:8000").await.map_err(|e| {
+        let db = Surreal::new::<Ws>(&self.database_url).await.map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
                 "Could not connect to the database".into(),
                 e.into(),
