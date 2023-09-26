@@ -2,7 +2,7 @@ use reqwest::{header, header::HeaderValue, Client as HttpClient, RequestBuilder}
 
 use std::env;
 
-use surrealdb::engine::remote::ws::{Client as SurrealClient, Wss};
+use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
 use surrealdb::opt::auth::Database;
 use surrealdb::Surreal;
 
@@ -146,7 +146,7 @@ impl DatabaseSdkContext {
         &self,
     ) -> Result<Surreal<SurrealClient>, ApplicationError> {
         // let db = Surreal::new::<Ws>(&self.database_url).await?;
-        let db = Surreal::new::<Wss>("localhost:8000").await.map_err(|e| {
+        let db = Surreal::new::<Ws>("localhost:8000").await.map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
                 "Could not connect to the database".into(),
                 e.into(),
