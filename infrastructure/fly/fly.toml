@@ -43,7 +43,7 @@ kill_timeout = 5
   
   [[services.ports]]
     port = 8000
-    handlers = ["http"]
+    handlers = ["tcp"]
   [services.concurrency]
     type = "connections"
     hard_limit = 25
