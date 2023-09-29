@@ -6,7 +6,7 @@ pub async fn query_product(
     context: &ApplicationContext,
     key: &str,
 ) -> Result<Product, ApplicationError> {
-    let db = context.database_sdk.init_database_connection().await?;
+    let db = context.database.init_database_connection().await?;
 
     let result: Option<Product> = db.select(("product", key)).await.map_err(|e| {
         ApplicationError::Unexpected(UnexpectedError::new(
