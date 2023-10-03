@@ -2,7 +2,7 @@ use serde_derive::{Deserialize, Serialize};
 
 use crate::types::Storable;
 
-use super::{NewProduct, Price, ProductQueryResults, QueryResult};
+use super::{NewProduct, Price};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Product {
@@ -61,19 +61,6 @@ impl Default for Product {
             description: None,
             price: None,
         }
-    }
-}
-
-impl From<ProductQueryResults> for Product {
-    fn from(results: ProductQueryResults) -> Self {
-        results.first().unwrap().into()
-    }
-}
-
-impl From<&QueryResult<Product>> for Product {
-    fn from(query_result: &QueryResult<Product>) -> Self {
-        let product = query_result.result.first().unwrap();
-        product.to_owned()
     }
 }
 
