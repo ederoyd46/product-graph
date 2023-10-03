@@ -18,7 +18,7 @@ pub struct ApplicationContextBuilder {
 impl ApplicationContextBuilder {
     pub fn new() -> Self {
         Self {
-            database_url: env::var("DATABASE_URL").unwrap_or("http://localhost:8000".to_string()),
+            database_url: env::var("DATABASE_URL").unwrap_or("localhost:8000".to_string()),
             database_username: env::var("DATABASE_USERNAME").unwrap_or("root".to_string()),
             database_password: env::var("DATABASE_PASSWORD").unwrap_or("root".to_string()),
             database_namespace: env::var("DATABASE_NAMESPACE").unwrap_or("test".to_string()),

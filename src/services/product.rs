@@ -1,7 +1,7 @@
 mod mutate;
 mod query;
 pub use mutate::mutate_product;
-pub use query::query_product;
+pub use query::{query_product, query_products};
 
 use serde::Serialize;
 

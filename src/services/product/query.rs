@@ -22,3 +22,19 @@ pub async fn query_product(
         None => Err(ApplicationError::NotFound),
     }
 }
+
+pub async fn query_products(
+    context: &ApplicationContext,
+) -> Result<Vec<Product>, ApplicationError> {
+    let db = context.database.init_database_connection().await?;
+
+    let result: Vec<Product> = db.select("product").await.map_err(|e| {
+        ApplicationError::Unexpected(UnexpectedError::new(
+            "Could not select from DB".into(),
+            e.into(),
+        ))
+    })?;
+
+    debug!("SDK {:?}", result);
+    Ok(result)
+}

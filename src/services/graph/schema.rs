@@ -2,7 +2,7 @@ use crate::types::{ApplicationContext, NewProduct, ViewProduct};
 use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode};
 impl juniper::Context for ApplicationContext {}
 
-use crate::services::product::{mutate_product, query_product};
+use crate::services::product::{mutate_product, query_product, query_products};
 
 pub struct QueryRoot;
 
@@ -15,6 +15,14 @@ impl QueryRoot {
     ) -> FieldResult<ViewProduct> {
         let found_product = query_product(context, &key).await?;
         Ok(found_product.into())
+    }
+    async fn products(&self, context: &'a ApplicationContext) -> FieldResult<Vec<ViewProduct>> {
+        let found_product = query_products(context).await?;
+        let mapped_products = found_product
+            .into_iter()
+            .map(|product| ViewProduct::from(product))
+            .collect();
+        Ok(mapped_products)
     }
 }
 
