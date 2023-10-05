@@ -9,18 +9,8 @@ pub struct Price {
     product_key: String,
     currency: String,
     country: String,
-
-    // #[serde(deserialize_with = "to_price")]
     amount: f64,
 }
-
-// fn to_price<'de, D>(val: D) -> Result<f64, D::Error>
-// where
-//     D: serde::Deserializer<'de>,
-// {
-//     let s: String = serde::Deserialize::deserialize(val)?;
-//     s.parse::<f64>().map_err(serde::de::Error::custom)
-// }
 
 impl Storable for Price {
     fn db_key(&self) -> String {
