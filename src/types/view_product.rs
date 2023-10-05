@@ -1,7 +1,5 @@
 use super::{view_price::ViewPrice, Product};
 
-// #[derive(GraphQLObject, Debug, Clone)]
-
 pub struct ViewProduct {
     key: String,
     name: String,

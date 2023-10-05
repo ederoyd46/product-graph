@@ -17,9 +17,12 @@ pub async fn mutate_product(
 
     if new_product.price.is_some() {
         let prices: Vec<Price> = new_product.clone().into();
-        for price in prices {
-            statements.push(build_mutate_statement(&price));
-        }
+        prices
+            .iter()
+            .for_each(|price| statements.push(build_mutate_statement(price)));
+        // for price in prices {
+        // statements.push(build_mutate_statement(&price));
+        // }
     }
     statements.push(build_mutate_statement(&product));
     debug!("REQUEST {:?}", statements);
