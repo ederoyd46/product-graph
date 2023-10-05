@@ -20,9 +20,6 @@ pub async fn mutate_product(
         prices
             .iter()
             .for_each(|price| statements.push(build_mutate_statement(price)));
-        // for price in prices {
-        // statements.push(build_mutate_statement(&price));
-        // }
     }
     statements.push(build_mutate_statement(&product));
     debug!("REQUEST {:?}", statements);
