@@ -33,6 +33,7 @@ create.fly.app:
 	@fly ips allocate-v4 --shared
 	@fly ips allocate-v6 --private #for fly cast only way to get 2 process groups to talk to each other at the moment
 	@fly volume create ederoyd_product_graph_db --region lhr --size 3  -y
+	@fly secrets set DATABASE_URL="ederoyd-product-graph.flycast:8000" #This will be available on as an environment variable
 
 build.fly.image: release
 	@docker buildx build --platform linux/amd64 -f ./infrastructure/fly/Dockerfile.GraphQL --tag registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) .
