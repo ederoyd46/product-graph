@@ -3,6 +3,7 @@ use log::debug;
 use crate::services::product::build_mutate_statement;
 use crate::types::{
     error::UnexpectedError, ApplicationContext, ApplicationError, NewProduct, Price, Product,
+    Products,
 };
 
 // select *, price[where currency='GBP'] from product fetch price;
@@ -11,7 +12,8 @@ pub async fn mutate_product(
     context: &ApplicationContext,
     new_product: NewProduct,
 ) -> Result<Product, ApplicationError> {
-    let product = Product::from(new_product.clone());
+    let products = Products::from(new_product.clone());
+    // let product = Product::from(new_product.clone());
     let db = context.database.init_database_connection().await?;
     let mut statements: Vec<String> = vec![];
 
@@ -21,7 +23,7 @@ pub async fn mutate_product(
             .iter()
             .for_each(|price| statements.push(build_mutate_statement(price)));
     }
-    statements.push(build_mutate_statement(&product));
+    statements.push(build_mutate_statement(&products[0]));
     debug!("REQUEST {:?}", statements);
 
     let product_response = db

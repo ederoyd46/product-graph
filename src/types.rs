@@ -1,8 +1,9 @@
+mod localised_string;
 mod price;
 mod product;
 
 pub use price::Price;
-pub use product::Product;
+pub use product::{Product, Products};
 
 mod new_inventory;
 mod new_price;

@@ -43,10 +43,10 @@ deploy.fly.image: build.fly.image
 	@flyctl deploy -c ./infrastructure/fly/fly.toml -r lhr -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
 
 start.db:
-	surreal start -u root -p root -- file://./data
+	surreal start --auth -u root -p root -- file://./data
 
 start.mem.db:
-	surreal start -u root -p root
+	surreal start --auth -u root -p root
 
 connect.db:
 	surreal sql -e http://localhost:8000 -u root -p root --ns test --db test --pretty

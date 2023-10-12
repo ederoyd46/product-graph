@@ -75,3 +75,17 @@ impl From<NewProduct> for Product {
         )
     }
 }
+
+pub type Products = Vec<Product>;
+
+impl From<NewProduct> for Products {
+    fn from(new_product: NewProduct) -> Self {
+        let product = new_product.clone();
+        vec![Product::new(
+            product.key,
+            product.name,
+            product.description,
+            { product.price }.map(|_| Vec::<Price>::from(new_product)),
+        )]
+    }
+}
