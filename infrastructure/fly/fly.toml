@@ -11,7 +11,7 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 
 [processes]
-  db = "/surreal start -u root -p root -- file:///data"
+  db = "/surreal start --auth -u root -p root -- file:///data"
   graph = "/product-graph"
 
 [[services]]
