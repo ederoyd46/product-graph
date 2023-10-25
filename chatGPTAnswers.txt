@@ -1,0 +1,22 @@
+In Rust, you cannot directly call an async function from a non-async function. Async functions return a type called `Future`, which represents a computation that may not have completed yet. To execute a `Future`, you need to use an executor, which is responsible for driving the execution of async functions.
+
+To call an async function from a non-async function, you can use the `block_on` function provided by the `tokio` or `async-std` libraries. Here's an example using `tokio`:
+
+```rust
+use tokio::runtime::Runtime;
+
+async fn async_function() {
+    // Your async code here
+}
+
+fn main() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async_function());
+}
+```
+
+In this example, we create a `Runtime` using `tokio::runtime::Runtime::new()`. Then, we use the `block_on` method of the `Runtime` to execute the async function `async_function()`.
+
+Make sure to add the `tokio` or `async-std` dependency to your `Cargo.toml` file, depending on which library you choose to use.
+
+Note that this approach blocks the current thread until the async function completes. If you need to call async functions from a non-async function without blocking the thread, you would need to use a different approach, such as spawning a new thread or using a different async runtime.

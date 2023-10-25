@@ -18,10 +18,7 @@ impl QueryRoot {
     }
     async fn products(&self, context: &'a ApplicationContext) -> FieldResult<Vec<ViewProduct>> {
         let found_product = query_products(context).await?;
-        let mapped_products = found_product
-            .into_iter()
-            .map(|product| ViewProduct::from(product))
-            .collect();
+        let mapped_products = found_product.into_iter().map(ViewProduct::from).collect();
         Ok(mapped_products)
     }
 }
