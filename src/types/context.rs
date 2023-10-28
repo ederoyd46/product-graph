@@ -51,46 +51,19 @@ impl ApplicationContextBuilder {
         self
     }
 
-    pub async fn build(self) -> ApplicationContext {
+    pub async fn build(self) -> Result<ApplicationContext, ApplicationError> {
         let database_context_sdk = DatabaseSdkContext {
             database_url: self.database_url.clone(),
             database_username: self.database_username.clone(),
             database_password: self.database_password.clone(),
             database_namespace: self.database_namespace.clone(),
             database_name: self.database_name.clone(),
+            client: self.init_database_connection().await?,
         };
 
-        ApplicationContext {
+        Ok(ApplicationContext {
             database: database_context_sdk,
-        }
-    }
-}
-
-impl Default for ApplicationContextBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Clone)]
-pub struct DatabaseSdkContext {
-    database_url: String,
-    database_username: String,
-    database_password: String,
-    database_namespace: String,
-    database_name: String,
-}
-
-impl DatabaseSdkContext {
-    pub fn get_database_info(&self) -> String {
-        format!(
-            "Database: {}://{}:{}@{}/{}",
-            self.database_url,
-            self.database_username,
-            self.database_password,
-            self.database_namespace,
-            self.database_name
-        )
+        })
     }
 
     pub async fn init_database_connection(
@@ -118,6 +91,39 @@ impl DatabaseSdkContext {
         })?;
 
         Ok(db)
+    }
+}
+
+impl Default for ApplicationContextBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Clone)]
+pub struct DatabaseSdkContext {
+    database_url: String,
+    database_username: String,
+    database_password: String,
+    database_namespace: String,
+    database_name: String,
+    client: Surreal<SurrealClient>,
+}
+
+impl DatabaseSdkContext {
+    pub fn get_database_info(&self) -> String {
+        format!(
+            "Database: {}://{}:{}@{}/{}",
+            self.database_url,
+            self.database_username,
+            self.database_password,
+            self.database_namespace,
+            self.database_name
+        )
+    }
+
+    pub fn get_connection(&self) -> &Surreal<SurrealClient> {
+        &self.client
     }
 }
 

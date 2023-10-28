@@ -6,7 +6,7 @@ pub async fn query_product(
     context: &ApplicationContext,
     key: &str,
 ) -> Result<Product, ApplicationError> {
-    let db = context.database.init_database_connection().await?;
+    let db = context.database.get_connection();
 
     let result: Option<Product> = db.select(("product", key)).await.map_err(|e| {
         ApplicationError::Unexpected(UnexpectedError::new(
@@ -26,7 +26,7 @@ pub async fn query_product(
 pub async fn query_products(
     context: &ApplicationContext,
 ) -> Result<Vec<Product>, ApplicationError> {
-    let db = context.database.init_database_connection().await?;
+    let db = context.database.get_connection();
 
     let results: Vec<Product> = db.select("product").await.map_err(|e| {
         ApplicationError::Unexpected(UnexpectedError::new(

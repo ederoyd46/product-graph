@@ -28,8 +28,6 @@ async fn service(
 pub fn setup(config: &mut web::ServiceConfig, context: ApplicationContext) {
     // Create Juniper schema
     let schema = Arc::new(create_schema());
-    // Build the context
-    // let context = Arc::new(ApplicationContextBuilder::default().build());
 
     config
         .app_data(Data::from(schema.clone()))

@@ -14,7 +14,7 @@ pub async fn mutate_product(
 ) -> Result<Product, ApplicationError> {
     let products = Products::from(new_product.clone());
     // let product = Product::from(new_product.clone());
-    let db = context.database.init_database_connection().await?;
+    let db = context.database.get_connection();
     let mut statements: Vec<String> = vec![];
 
     if new_product.price.is_some() {
