@@ -2,7 +2,7 @@ pub mod schema;
 
 use std::sync::Arc;
 
-use crate::types::{ApplicationContext, ApplicationContextBuilder};
+use crate::types::ApplicationContext;
 use juniper::http::GraphQLRequest;
 use schema::Schema;
 
@@ -25,14 +25,14 @@ async fn service(
     HttpResponse::Ok().json(response_data)
 }
 
-pub fn setup(config: &mut web::ServiceConfig) {
+pub fn setup(config: &mut web::ServiceConfig, context: ApplicationContext) {
     // Create Juniper schema
     let schema = Arc::new(create_schema());
     // Build the context
-    let context = Arc::new(ApplicationContextBuilder::default().build());
+    // let context = Arc::new(ApplicationContextBuilder::default().build());
 
     config
         .app_data(Data::from(schema.clone()))
-        .app_data(Data::from(context))
+        .app_data(Data::from(Arc::new(context)))
         .service(service);
 }

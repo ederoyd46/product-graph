@@ -51,7 +51,7 @@ impl ApplicationContextBuilder {
         self
     }
 
-    pub fn build(self) -> ApplicationContext {
+    pub async fn build(self) -> ApplicationContext {
         let database_context_sdk = DatabaseSdkContext {
             database_url: self.database_url.clone(),
             database_username: self.database_username.clone(),
@@ -72,6 +72,7 @@ impl Default for ApplicationContextBuilder {
     }
 }
 
+#[derive(Clone)]
 pub struct DatabaseSdkContext {
     database_url: String,
     database_username: String,
@@ -120,6 +121,7 @@ impl DatabaseSdkContext {
     }
 }
 
+#[derive(Clone)]
 pub struct ApplicationContext {
     pub database: DatabaseSdkContext,
 }

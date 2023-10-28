@@ -1,15 +1,19 @@
-use std::io;
 use actix_cors::Cors;
 use actix_web::{dev::Service as _, middleware, App, HttpServer};
 use juniper::futures::FutureExt;
-use product_graph::services::{echo, graph};
+use product_graph::{
+    services::{echo, graph},
+    types::ApplicationContextBuilder,
+};
+use std::io;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
-    log::info!("starting HTTP server on port 8080 ...");
+    let context = ApplicationContextBuilder::default().build().await;
 
+    log::info!("starting HTTP server on port 8080 ...");
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
@@ -24,7 +28,7 @@ async fn main() -> io::Result<()> {
             })
             .wrap(Cors::permissive()) //If you want to use Apollo Studio you need this
             .wrap(middleware::Logger::default())
-            .configure(graph::setup)
+            .configure(|config| graph::setup(config, context.clone()))
             .configure(echo::setup)
     })
     .workers(2)
