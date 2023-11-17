@@ -66,9 +66,7 @@ impl ApplicationContextBuilder {
         })
     }
 
-    pub async fn init_database_connection(
-        &self,
-    ) -> Result<Surreal<SurrealClient>, ApplicationError> {
+    async fn init_database_connection(&self) -> Result<Surreal<SurrealClient>, ApplicationError> {
         let db = Surreal::new::<Ws>(&self.database_url).await.map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
                 "Could not connect to the database".into(),

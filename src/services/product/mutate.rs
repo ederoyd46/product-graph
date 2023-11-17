@@ -13,7 +13,6 @@ pub async fn mutate_product(
     new_product: NewProduct,
 ) -> Result<Product, ApplicationError> {
     let products = Products::from(new_product.clone());
-    // let product = Product::from(new_product.clone());
     let db = context.database.get_connection();
     let mut statements: Vec<String> = vec![];
 
