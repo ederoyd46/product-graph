@@ -14,7 +14,7 @@ use actix_web::{
 
 use self::schema::create_schema;
 
-/// GraphQL endpoint
+// GraphQL endpoint
 #[route("/", method = "GET", method = "POST")]
 async fn service(
     schema: web::Data<Schema>,

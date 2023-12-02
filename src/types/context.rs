@@ -1,5 +1,6 @@
 use std::env;
 
+use log::info;
 use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
 use surrealdb::opt::auth::Database;
 use surrealdb::Surreal;
@@ -74,20 +75,22 @@ impl ApplicationContextBuilder {
             ))
         })?;
 
-        db.signin(Database {
-            username: &self.database_username,
-            password: &self.database_password,
-            namespace: &self.database_namespace,
-            database: &self.database_name,
-        })
-        .await
-        .map_err(|e| {
-            ApplicationError::Unexpected(UnexpectedError::new(
-                "Could not sign in to data".into(),
-                e.into(),
-            ))
-        })?;
+        let jwt = db
+            .signin(Database {
+                username: &self.database_username,
+                password: &self.database_password,
+                namespace: &self.database_namespace,
+                database: &self.database_name,
+            })
+            .await
+            .map_err(|e| {
+                ApplicationError::Unexpected(UnexpectedError::new(
+                    "Could not sign in to data".into(),
+                    e.into(),
+                ))
+            })?;
 
+        info!("JWT: {:?}", jwt.into_insecure_token().to_string());
         Ok(db)
     }
 }
