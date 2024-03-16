@@ -17,7 +17,7 @@
       packages.default =
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          target = "aarch64-unknown-linux-gnu";
+          target = "x86_64-unknown-linux-musl";
           toolchain = with fenix.packages.${system}; combine [
             minimal.cargo
             minimal.rustc
@@ -31,9 +31,9 @@
         }).buildPackage {
           src = ./.;
           CARGO_BUILD_TARGET = target;
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER =
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER =
             let
-              inherit (pkgs.pkgsCross.aarch64-multiplatform.stdenv) cc;
+              inherit (pkgs.pkgsCross.musl64.stdenv) cc;
             in
             "${cc}/bin/${cc.targetPrefix}cc";
         };
