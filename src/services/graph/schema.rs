@@ -8,15 +8,11 @@ pub struct QueryRoot;
 
 #[graphql_object(Context = ApplicationContext)]
 impl QueryRoot {
-    async fn product(
-        &self,
-        key: String,
-        context: &'a ApplicationContext,
-    ) -> FieldResult<ViewProduct> {
+    async fn product(&self, key: String, context: &ApplicationContext) -> FieldResult<ViewProduct> {
         let found_product = query_product(context, &key).await?;
         Ok(found_product.into())
     }
-    async fn products(&self, context: &'a ApplicationContext) -> FieldResult<Vec<ViewProduct>> {
+    async fn products(&self, context: &ApplicationContext) -> FieldResult<Vec<ViewProduct>> {
         let found_product = query_products(context).await?;
         let mapped_products = found_product.into_iter().map(ViewProduct::from).collect();
         Ok(mapped_products)
