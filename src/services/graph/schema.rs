@@ -23,9 +23,9 @@ pub struct MutationRoot;
 
 #[graphql_object(Context = ApplicationContext)]
 impl MutationRoot {
-    async fn product<'a>(
+    async fn product(
         &self,
-        context: &'a ApplicationContext,
+        context: &ApplicationContext,
         new_product: NewProduct,
     ) -> FieldResult<ViewProduct> {
         log::info!("Mutating product: {:?}", new_product);

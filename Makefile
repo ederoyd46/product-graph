@@ -3,7 +3,6 @@ BASE_DIR=$(shell pwd)
 UNAME_S=$(shell uname -s)
 
 CROSS_TARGET=x86_64-unknown-linux-musl
-CROSS_COMPILE=x86_64-linux-musl-
 
 CURRENT_TAG_VERSION=$(shell git log --format="%h" -n 1)
 
@@ -21,11 +20,7 @@ test:
 	@cargo test
 
 release:
-ifeq ("$(UNAME_S)","Linux")
-	@cargo build --target=$(CROSS_TARGET) --release
-else
-	@CROSS_COMPILE=$(CROSS_COMPILE) cargo build --target=$(CROSS_TARGET) --release
-endif
+	cargo zigbuild --release --target $(CROSS_TARGET)
 
 create.fly.app:
 	@fly apps create --name ederoyd-product-graph
