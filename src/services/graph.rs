@@ -17,8 +17,8 @@ use self::schema::create_schema;
 // GraphQL endpoint
 #[route("/", method = "GET", method = "POST")]
 async fn service(
-    schema: web::Data<Schema>,
-    context: web::Data<ApplicationContext>,
+    schema: Data<Schema>,
+    context: Data<ApplicationContext>,
     data: web::Json<GraphQLRequest>,
 ) -> impl Responder {
     let response_data = data.execute(&schema, &context).await;
