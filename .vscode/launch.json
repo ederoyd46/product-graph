@@ -6,8 +6,10 @@
       "request": "launch",
       "name": "Product Graph",
       "cargo": {
-        "args": ["build"]
+        "args": [
+          "build"
+        ]
       }
-    },
+    }
   ]
 }
