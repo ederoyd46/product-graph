@@ -2,7 +2,7 @@
   description = "Rust project with cross-compilation to MUSL and WASM";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -34,12 +34,13 @@
         };
       in
       {
+        # Nix seems to like plurals when using flake-utils so use packages and set a default, then you can run nix build .
         packages = rec {
           default = standardBuild;
 
           standardBuild = pkgs.rustPlatform.buildRustPackage {
             name = "product-graph";
-            buildInputs = with pkgs; [ darwin.Security ] ++ [ rustSetup ];
+            buildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
             src = self;
             cargoLock = {
               lockFile = ./Cargo.lock;
@@ -51,13 +52,13 @@
             buildInputs =
               with pkgs;
               [
-                darwin.Security
                 gnumake
                 cargo-lambda
                 cargo-zigbuild
-                zig
+                rustSetup
               ]
-              ++ [ rustSetup ];
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+
             src = self;
             buildPhase = ''
               echo HERE!!!
@@ -66,6 +67,7 @@
           };
         };
 
+        # Nix seems to like plurals when using flake-utils so use devShells and set a default, then you can run nix develop . or nix develop .#devShells
         devShells = rec {
           default = devShell;
 
@@ -77,8 +79,9 @@
                 cargo-lambda
                 cargo-zigbuild
                 darwin.Security
+                rustSetup
               ]
-              ++ [ rustSetup ];
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
           };
         };
       }
