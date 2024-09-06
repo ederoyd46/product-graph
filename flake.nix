@@ -39,7 +39,6 @@
             zig
             cargo-lambda
             cargo-zigbuild
-            # darwin.apple_sdk.frameworks.Security
             darwin.Security
           ]
           ++ [ rustSetup ];
