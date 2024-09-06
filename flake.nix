@@ -2,7 +2,7 @@
   description = "Rust project with cross-compilation to MUSL and WASM";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -17,7 +17,6 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        # system = "aarch64-darwin";
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
 
@@ -33,46 +32,54 @@
             "wasm32-wasi"
           ];
         };
-
       in
       {
-        devShell = pkgs.mkShell {
-          buildInputs =
-            with pkgs;
-            [
-              zig
-              cargo-lambda
-              cargo-zigbuild
-              darwin.Security
-            ]
-            ++ [ rustSetup ];
+        packages = rec {
+          default = standardBuild;
 
-        };
+          standardBuild = pkgs.rustPlatform.buildRustPackage {
+            name = "product-graph";
+            buildInputs = with pkgs; [ darwin.Security ] ++ [ rustSetup ];
+            src = self;
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+            };
+          };
 
-        packages.${system}.default = self.standardBuild;
-
-        standardBuild = pkgs.rustPlatform.buildRustPackage {
-          name = "product-graph";
-          buildInputs = with pkgs; [ darwin.Security ] ++ [ rustSetup ];
-          src = self;
-          cargoLock = {
-            lockFile = ./Cargo.lock;
+          mattBuild = pkgs.stdenv.mkDerivation {
+            name = "product-graph";
+            buildInputs =
+              with pkgs;
+              [
+                darwin.Security
+                gnumake
+                cargo-lambda
+                cargo-zigbuild
+                zig
+              ]
+              ++ [ rustSetup ];
+            src = self;
+            buildPhase = ''
+              echo HERE!!!
+              cargo zigbuild
+            '';
           };
         };
 
-        matt1 = pkgs.stdenv.mkDerivation {
-          name = "product-graph";
-          buildInputs =
-            with pkgs;
-            [
-              darwin.Security
-              gnumake
-            ]
-            ++ [ rustSetup ];
-          src = self;
-          buildPhase = ''
-            make release
-          '';
+        devShells = rec {
+          default = devShell;
+
+          devShell = pkgs.mkShell {
+            buildInputs =
+              with pkgs;
+              [
+                zig
+                cargo-lambda
+                cargo-zigbuild
+                darwin.Security
+              ]
+              ++ [ rustSetup ];
+          };
         };
       }
     );
