@@ -53,16 +53,24 @@
               with pkgs;
               [
                 gnumake
-                cargo-lambda
                 cargo-zigbuild
                 rustSetup
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
 
             src = self;
+
+            # Add cargo dependencies like this as we have no network access here
+            cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
+            nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
+
             buildPhase = ''
-              echo HERE!!!
-              cargo zigbuild
+              cargo build --release
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp target/release/product-graph $out/bin
             '';
           };
         };
@@ -78,7 +86,6 @@
                 zig
                 cargo-lambda
                 cargo-zigbuild
-                darwin.Security
                 rustSetup
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
