@@ -44,5 +44,33 @@
           ++ [ rustSetup ];
 
       };
+
+      packages.${system}.default = self.standardBuild;
+
+      standardBuild = pkgs.rustPlatform.buildRustPackage {
+        name = "product-graph";
+        buildInputs = with pkgs; [ darwin.Security ] ++ [ rustSetup ];
+        src = self;
+        cargoLock = {
+          lockFile = ./Cargo.lock;
+        };
+      };
+
+      matt1 = pkgs.stdenv.mkDerivation {
+        name = "product-graph";
+        buildInputs =
+          with pkgs;
+          [
+            darwin.Security
+            gnumake
+          ]
+          ++ [ rustSetup ];
+        src = self;
+        buildPhase = ''
+          make build
+          # cargo build --release --target x86_64-unknown-linux-musl
+        '';
+      };
+
     };
 }
