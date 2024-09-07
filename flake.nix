@@ -60,7 +60,7 @@
 
             src = self;
 
-            # Add cargo dependencies like this as we have no network access here
+            # As cargo dependencies like this as we have no network access here
             cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
             nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
