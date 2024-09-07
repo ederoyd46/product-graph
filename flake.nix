@@ -65,7 +65,7 @@
             nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
             buildPhase = ''
-              cargo build --release
+              make build
             '';
 
             installPhase = ''
