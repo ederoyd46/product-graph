@@ -1,5 +1,5 @@
 {
-  description = "Rust project with cross-compilation to MUSL and WASM";
+  description = "Rust project";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -47,6 +47,7 @@
             };
           };
 
+          # Does not work due to read only file system issue when zig tries to cross compile.
           mattBuild = pkgs.stdenv.mkDerivation {
             name = "product-graph";
             buildInputs =
@@ -65,7 +66,8 @@
             nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
             buildPhase = ''
-              make build
+              # make build
+              cargo build --release
             '';
 
             installPhase = ''
