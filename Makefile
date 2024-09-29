@@ -35,7 +35,7 @@ build.fly.image: release
 
 deploy.fly.image: build.fly.image
 	@docker push registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION)
-	@flyctl deploy -c ./infrastructure/fly/fly.toml -r lhr -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
+	@flyctl deploy -c ./infrastructure/fly/fly.toml -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
 
 start.db:
 	surreal start --auth -u root -p root -- file://./data

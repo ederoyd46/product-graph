@@ -28,7 +28,7 @@
             "rust-docs"
           ];
           targets = [
-            "x86_64-unknown-linux-musl"
+            "x86_64-unknown-linux-musl" # Release target for AWS Lambda/Fly
             "wasm32-wasi"
           ];
         };
@@ -36,9 +36,9 @@
       {
         # Nix seems to like plurals when using flake-utils so use packages and set a default, then you can run nix build .
         packages = rec {
-          default = standardBuild;
+          default = build;
 
-          standardBuild = pkgs.rustPlatform.buildRustPackage {
+          build = pkgs.rustPlatform.buildRustPackage {
             name = "product-graph";
             buildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
             src = self;
@@ -47,37 +47,37 @@
             };
           };
 
-          # Does not work due to read only file system issue when zig tries to cross compile.
-          mattBuild = pkgs.stdenv.mkDerivation {
-            name = "product-graph";
-            buildInputs =
-              with pkgs;
-              [
-                gnumake
-                cargo-zigbuild
-                rustSetup
-              ]
-              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+          # TODO Fix - does not work due to read only file system issue when zig tries to cross compile.
+          # buildWithRustSetup = pkgs.stdenv.mkDerivation {
+          #   name = "product-graph";
+          #   buildInputs =
+          #     with pkgs;
+          #     [
+          #       gnumake
+          #       cargo-zigbuild
+          #       rustSetup
+          #     ]
+          #     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
 
-            src = self;
+          #   src = self;
 
-            # As cargo dependencies like this as we have no network access here
-            cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
-            nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
+          #   # As cargo dependencies like this as we have no network access here
+          #   cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
+          #   nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
-            buildPhase = ''
-              # make build
-              cargo build --release
-            '';
+          #   buildPhase = ''
+          #     # make build
+          #     cargo build --release
+          #   '';
 
-            installPhase = ''
-              mkdir -p $out/bin
-              cp target/release/product-graph $out/bin
-            '';
-          };
+          #   installPhase = ''
+          #     mkdir -p $out/bin
+          #     cp target/release/product-graph $out/bin
+          #   '';
+          # };
         };
 
-        # Nix seems to like plurals when using flake-utils so use devShells and set a default, then you can run nix develop . or nix develop .#devShells
+        # Nix likes plurals when using flake-utils so use devShells and set a default, then you can run nix develop . or nix develop .#devShells
         devShells = rec {
           default = devShell;
 
@@ -89,6 +89,7 @@
                 cargo-lambda
                 cargo-zigbuild
                 rustSetup
+                (surrealdb.overrideAttrs { meta.license = [ "free" ]; }) # Override the license to bypass unfree warnings
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
           };
