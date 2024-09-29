@@ -32,6 +32,37 @@
             "wasm32-wasi"
           ];
         };
+
+        buildWithRustSetup =
+          target:
+          pkgs.stdenv.mkDerivation {
+            name = "product-graph";
+            buildInputs =
+              with pkgs;
+              [
+                gnumake
+                cargo-zigbuild
+                rustSetup
+              ]
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+
+            src = self;
+
+            # As cargo dependencies like this as we have no network access here
+            cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
+            nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
+
+            buildPhase = ''
+              # Build artifacts
+              export HOME=$(pwd) #work around for readonly homeless-shelter
+              cargo zigbuild --release --target ${target};
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp target/${target}/release/product-graph $out/bin
+            '';
+          };
       in
       {
         # Nix seems to like plurals when using flake-utils so use packages and set a default, then you can run nix build .
@@ -47,45 +78,14 @@
             };
           };
 
-          buildWithRustSetup =
-            let
-              target = "x86_64-unknown-linux-musl"; # Release target for AWS Lambda/Fly
-            in
-            pkgs.stdenv.mkDerivation {
-              name = "product-graph";
-              buildInputs =
-                with pkgs;
-                [
-                  gnumake
-                  cargo-zigbuild
-                  rustSetup
-                ]
-                ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
-
-              src = self;
-
-              # As cargo dependencies like this as we have no network access here
-              cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
-              nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
-
-              buildPhase = ''
-                # Build artifacts
-                export HOME=$(pwd) #work around for readonly homeless-shelter
-                cargo zigbuild --release --target ${target};
-              '';
-
-              installPhase = ''
-                mkdir -p $out/bin
-                cp target/${target}/release/product-graph $out/bin
-              '';
-            };
+          buildMuslWithRustSetup = buildWithRustSetup "x86_64-unknown-linux-musl";
 
           buildDocker = pkgs.dockerTools.buildImage {
             name = "product-graph";
             tag = "latest";
             config = {
-              Content = buildWithRustSetup;
-              Cmd = "${buildWithRustSetup}/bin/product-graph";
+              Content = buildMuslWithRustSetup;
+              Cmd = "${buildMuslWithRustSetup}/bin/product-graph";
             };
           };
         };
