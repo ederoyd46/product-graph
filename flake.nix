@@ -29,7 +29,9 @@
           ];
           targets = [
             "x86_64-unknown-linux-musl" # Release target for AWS Lambda/Fly
-            "wasm32-wasi"
+            "x86_64-unknown-linux-gnu"
+            "aarch64-apple-darwin"
+            "x86_64-apple-darwin"
           ];
         };
 
@@ -80,7 +82,7 @@
 
           buildMuslWithRustSetup = buildWithRustSetup "x86_64-unknown-linux-musl";
 
-          buildDocker = pkgs.dockerTools.buildImage {
+          buildDockerImage = pkgs.dockerTools.buildImage {
             name = "product-graph";
             tag = "latest";
             config = {
