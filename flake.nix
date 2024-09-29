@@ -47,34 +47,38 @@
             };
           };
 
-          # TODO Fix - does not work due to read only file system issue when zig tries to cross compile.
-          # buildWithRustSetup = pkgs.stdenv.mkDerivation {
-          #   name = "product-graph";
-          #   buildInputs =
-          #     with pkgs;
-          #     [
-          #       gnumake
-          #       cargo-zigbuild
-          #       rustSetup
-          #     ]
-          #     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+          buildWithRustSetup = pkgs.stdenv.mkDerivation {
+            name = "product-graph";
+            buildInputs =
+              with pkgs;
+              [
+                gnumake
+                cargo-zigbuild
+                rustSetup
+              ]
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
 
-          #   src = self;
+            src = self;
 
-          #   # As cargo dependencies like this as we have no network access here
-          #   cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
-          #   nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
+            # As cargo dependencies like this as we have no network access here
+            cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
+            nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
-          #   buildPhase = ''
-          #     # make build
-          #     cargo build --release
-          #   '';
+            buildPhase = ''
+              # Build artifacts
+              export HOME=$(pwd) #work around for readonly homeless-shelter
+              cargo zigbuild --release
+              cargo zigbuild --release --target x86_64-unknown-linux-musl #build target for AWS Lambda/Fly
+            '';
 
-          #   installPhase = ''
-          #     mkdir -p $out/bin
-          #     cp target/release/product-graph $out/bin
-          #   '';
-          # };
+            installPhase = ''
+              mkdir -p $out/${system}/bin
+              cp target/release/product-graph $out/${system}/bin
+
+              mkdir -p $out/x86_64-unknown-linux-musl/bin
+              cp target/x86_64-unknown-linux-musl/release/product-graph $out/x86_64-unknown-linux-musl/bin
+            '';
+          };
         };
 
         # Nix likes plurals when using flake-utils so use devShells and set a default, then you can run nix develop . or nix develop .#devShells
@@ -88,8 +92,8 @@
                 zig
                 cargo-lambda
                 cargo-zigbuild
-                rustSetup
                 (surrealdb.overrideAttrs { meta.license = [ "free" ]; }) # Override the license to bypass unfree warnings
+                rustSetup
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
           };
