@@ -47,37 +47,46 @@
             };
           };
 
-          buildWithRustSetup = pkgs.stdenv.mkDerivation {
+          buildWithRustSetup =
+            let
+              target = "x86_64-unknown-linux-musl"; # Release target for AWS Lambda/Fly
+            in
+            pkgs.stdenv.mkDerivation {
+              name = "product-graph";
+              buildInputs =
+                with pkgs;
+                [
+                  gnumake
+                  cargo-zigbuild
+                  rustSetup
+                ]
+                ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+
+              src = self;
+
+              # As cargo dependencies like this as we have no network access here
+              cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
+              nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
+
+              buildPhase = ''
+                # Build artifacts
+                export HOME=$(pwd) #work around for readonly homeless-shelter
+                cargo zigbuild --release --target ${target};
+              '';
+
+              installPhase = ''
+                mkdir -p $out/bin
+                cp target/${target}/release/product-graph $out/bin
+              '';
+            };
+
+          buildDocker = pkgs.dockerTools.buildImage {
             name = "product-graph";
-            buildInputs =
-              with pkgs;
-              [
-                gnumake
-                cargo-zigbuild
-                rustSetup
-              ]
-              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
-
-            src = self;
-
-            # As cargo dependencies like this as we have no network access here
-            cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
-            nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
-
-            buildPhase = ''
-              # Build artifacts
-              export HOME=$(pwd) #work around for readonly homeless-shelter
-              cargo zigbuild --release
-              cargo zigbuild --release --target x86_64-unknown-linux-musl #build target for AWS Lambda/Fly
-            '';
-
-            installPhase = ''
-              mkdir -p $out/${system}/bin
-              cp target/release/product-graph $out/${system}/bin
-
-              mkdir -p $out/x86_64-unknown-linux-musl/bin
-              cp target/x86_64-unknown-linux-musl/release/product-graph $out/x86_64-unknown-linux-musl/bin
-            '';
+            tag = "latest";
+            config = {
+              Content = buildWithRustSetup;
+              Cmd = "${buildWithRustSetup}/bin/product-graph";
+            };
           };
         };
 
