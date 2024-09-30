@@ -2,7 +2,7 @@ use std::env;
 
 use log::info;
 use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
-use surrealdb::opt::auth::Database;
+use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
 
 use super::error::UnexpectedError;
@@ -19,7 +19,7 @@ pub struct ApplicationContextBuilder {
 impl ApplicationContextBuilder {
     pub fn new() -> Self {
         Self {
-            database_url: env::var("DATABASE_URL").unwrap_or("localhost:8000".to_string()),
+            database_url: env::var("DATABASE_URL").unwrap_or("127.0.0.1:8000".to_string()),
             database_username: env::var("DATABASE_USERNAME").unwrap_or("root".to_string()),
             database_password: env::var("DATABASE_PASSWORD").unwrap_or("root".to_string()),
             database_namespace: env::var("DATABASE_NAMESPACE").unwrap_or("test".to_string()),
@@ -76,20 +76,43 @@ impl ApplicationContextBuilder {
         })?;
 
         let jwt = db
-            .signin(Database {
+            .signin(Root {
                 username: &self.database_username,
                 password: &self.database_password,
-                namespace: &self.database_namespace,
-                database: &self.database_name,
             })
             .await
             .map_err(|e| {
                 ApplicationError::Unexpected(UnexpectedError::new(
-                    "Could not sign in to data".into(),
+                    "Could not sign in to database".into(),
                     e.into(),
                 ))
             })?;
 
+        db.use_ns(&self.database_namespace)
+            .use_db(&self.database_name)
+            .await
+            .map_err(|e| {
+                ApplicationError::Unexpected(UnexpectedError::new(
+                    "Could not use namespace and database".into(),
+                    e.into(),
+                ))
+            })?;
+
+        // let jwt = db
+        //     .signin(Database {
+        //         username: &self.database_username,
+        //         password: &self.database_password,
+        //         namespace: &self.database_namespace,
+        //         database: &self.database_name,
+        //     })
+        //     .await
+        //     .map_err(|e| {
+        //         ApplicationError::Unexpected(UnexpectedError::new(
+        //             "Could not sign in to database".into(),
+        //             e.into(),
+        //         ))
+        //     })?;
+        //
         info!("JWT: {:?}", jwt.into_insecure_token().to_string());
         Ok(db)
     }

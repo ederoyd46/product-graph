@@ -38,13 +38,13 @@ deploy.fly.image: build.fly.image
 	@flyctl deploy -c ./infrastructure/fly/fly.toml -i registry.fly.io/ederoyd-product-graph:$(CURRENT_TAG_VERSION) -a ederoyd-product-graph
 
 start.db:
-	surreal start -- surrealkv://./data
+	surreal start -u root -p root -- surrealkv://./data
 
 start.mem.db:
-	surreal start
+	surreal start -u root -p root
 
 connect.db:
-	surreal sql -e http://localhost:8000 -u root -p root --ns test --db test --pretty
+	surreal sql -e http://localhost:8000 --ns test --db test -u root -p root --pretty
 
 connect.db.remote:
-	surreal sql -e http://ederoyd-product-graph.flycast:8000 -u root -p root --ns test --db test --pretty
+	surreal sql -e http://ederoyd-product-graph.flycast:8000 --ns test --db test -u root -p root --pretty
