@@ -9,7 +9,7 @@ use crate::types::Storable;
 
 pub fn build_mutate_statement<T: Storable + Serialize>(o: &T) -> String {
     format!(
-        "update {} content {}",
+        "upsert {} content {}",
         o.db_key(),
         serde_json::to_string(&o).unwrap()
     )

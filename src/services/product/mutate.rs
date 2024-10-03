@@ -32,6 +32,8 @@ pub async fn mutate_product(
         .await
         .map_err(|e| ApplicationError::Unexpected(UnexpectedError::new(e.to_string(), e.into())))?;
 
+    // dbg!(&product_response);
+
     let mut result = product_response.check().map_err(|e| {
         ApplicationError::Unexpected(UnexpectedError::new(
             "Could not parse product response".to_string(),
@@ -39,6 +41,12 @@ pub async fn mutate_product(
         ))
     })?;
 
+    db.query("select * from product").await.map_err(|e| {
+        ApplicationError::Unexpected(UnexpectedError::new(
+            "Could not fetch products".to_string(),
+            e.into(),
+        ))
+    })?;
     let product: Option<Product> = result.take(result.num_statements() - 1).unwrap();
 
     debug!("RESPONSE {:?}", result);

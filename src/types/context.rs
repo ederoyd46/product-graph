@@ -1,8 +1,9 @@
 use std::env;
 
-use log::info;
-use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
-use surrealdb::opt::auth::Root;
+// use log::info;
+use surrealdb::engine::local::{Db, Mem};
+// use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
+// use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
 
 use super::error::UnexpectedError;
@@ -67,26 +68,33 @@ impl ApplicationContextBuilder {
         })
     }
 
-    async fn init_database_connection(&self) -> Result<Surreal<SurrealClient>, ApplicationError> {
-        let db = Surreal::new::<Ws>(&self.database_url).await.map_err(|e| {
+    async fn init_database_connection(&self) -> Result<Surreal<Db>, ApplicationError> {
+        let db = Surreal::new::<Mem>(()).await.map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
-                "Could not connect to the database".into(),
+                "Could not connect to the embedded database".into(),
                 e.into(),
             ))
         })?;
 
-        let jwt = db
-            .signin(Root {
-                username: &self.database_username,
-                password: &self.database_password,
-            })
-            .await
-            .map_err(|e| {
-                ApplicationError::Unexpected(UnexpectedError::new(
-                    "Could not sign in to database".into(),
-                    e.into(),
-                ))
-            })?;
+        // let db = Surreal::new::<Ws>(&self.database_url).await.map_err(|e| {
+        //     ApplicationError::Unexpected(UnexpectedError::new(
+        //         "Could not connect to the database".into(),
+        //         e.into(),
+        //     ))
+        // })?;
+
+        // let jwt = db
+        //     .signin(Root {
+        //         username: &self.database_username,
+        //         password: &self.database_password,
+        //     })
+        //     .await
+        //     .map_err(|e| {
+        //         ApplicationError::Unexpected(UnexpectedError::new(
+        //             "Could not sign in to database".into(),
+        //             e.into(),
+        //         ))
+        //     })?;
 
         db.use_ns(&self.database_namespace)
             .use_db(&self.database_name)
@@ -113,7 +121,8 @@ impl ApplicationContextBuilder {
         //         ))
         //     })?;
         //
-        info!("JWT: {:?}", jwt.into_insecure_token().to_string());
+        // info!("JWT: {:?}", jwt.into_insecure_token().to_string());
+        log::info!("Started Database");
         Ok(db)
     }
 }
@@ -131,7 +140,7 @@ pub struct DatabaseSdkContext {
     database_password: String,
     database_namespace: String,
     database_name: String,
-    client: Surreal<SurrealClient>,
+    client: Surreal<Db>,
 }
 
 impl DatabaseSdkContext {
@@ -146,7 +155,7 @@ impl DatabaseSdkContext {
         )
     }
 
-    pub fn get_connection(&self) -> &Surreal<SurrealClient> {
+    pub fn get_connection(&self) -> &Surreal<Db> {
         &self.client
     }
 }
