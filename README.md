@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a Rust-based application that uses various dependencies and tools to build, run, and deploy. This README will guide you through setting up the project using Nix and the Makefile.
+This project is a Rust-based application that creates a graph of products and their relationships. The application reads a JSON file containing product data and generates a graph based on the relationships between the products.
 
 ## Prerequisites
 

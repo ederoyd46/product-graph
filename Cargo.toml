@@ -25,5 +25,5 @@ serde = "1.0"
 surrealdb = { version = "2", features = ["kv-mem"] }
 
 # once_cell = "1"
-# [profile.release]
-# opt-level = 'z'
+[profile.release]
+opt-level = 'z'
