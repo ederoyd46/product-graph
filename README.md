@@ -16,7 +16,7 @@ This project is a Rust-based application that uses various dependencies and tool
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/your-repo/product-graph.git
+   git clone https://github.com/ederoyd46/product-graph.git
    cd product-graph
    ```
 
