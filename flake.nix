@@ -100,11 +100,11 @@
             buildInputs =
               with pkgs;
               [
-                zig
-                cargo-lambda
                 cargo-zigbuild
-                # (surrealdb.overrideAttrs { meta.license = [ "free" ]; }) # Override the license to bypass unfree warnings
                 rustSetup
+                # (surrealdb.overrideAttrs { meta.license = [ "free" ]; }) # Override the license to bypass unfree warnings
+                # zig
+                # cargo-lambda
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
           };
