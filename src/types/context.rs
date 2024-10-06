@@ -1,9 +1,6 @@
 use std::env;
 
-// use log::info;
 use surrealdb::engine::local::{Db, Mem};
-// use surrealdb::engine::remote::ws::{Client as SurrealClient, Ws};
-// use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
 
 use super::error::UnexpectedError;

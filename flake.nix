@@ -50,12 +50,11 @@
 
             src = self;
 
-            # As cargo dependencies like this as we have no network access here
+            # Add cargo dependencies like this as we have no network access here
             cargoDeps = pkgs.rustPlatform.importCargoLock { lockFile = ./Cargo.lock; };
             nativeBuildInputs = with pkgs.rustPlatform; [ cargoSetupHook ];
 
             buildPhase = ''
-              # Build artifacts
               export HOME=$(pwd) #work around for readonly homeless-shelter
               cargo zigbuild --release --target ${target};
             '';
@@ -67,7 +66,6 @@
           };
       in
       {
-        # Nix seems to like plurals when using flake-utils so use packages and set a default, then you can run nix build .
         packages = rec {
           default = build;
 
@@ -92,7 +90,6 @@
           };
         };
 
-        # Nix likes plurals when using flake-utils so use devShells and set a default, then you can run nix develop . or nix develop .#devShells
         devShells = rec {
           default = devShell;
 

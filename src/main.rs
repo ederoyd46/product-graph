@@ -17,15 +17,6 @@ async fn main() -> io::Result<()> {
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
-            // .wrap_fn(|req, srv| {
-            //     if let Some(ip) = req.headers().get("x-forwarded-for") {
-            //         log::info!("IP: {}", ip.to_str().unwrap());
-            //     }
-            //     srv.call(req).map(|res| {
-            //         log::info!("RESPONSE {}", res.as_ref().unwrap().status());
-            //         res
-            //     })
-            // })
             .wrap(Cors::permissive()) //If you want to use Apollo Studio you need this
             .wrap(middleware::Logger::default())
             .configure(|config| graph::setup(config, context.clone()))
