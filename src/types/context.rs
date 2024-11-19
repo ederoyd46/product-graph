@@ -64,7 +64,6 @@ impl ApplicationContextBuilder {
             database: database_context_sdk,
         })
     }
-
     async fn init_database_connection(&self) -> Result<Surreal<Db>, ApplicationError> {
         let db = Surreal::new::<Mem>(()).await.map_err(|e| {
             ApplicationError::Unexpected(UnexpectedError::new(
