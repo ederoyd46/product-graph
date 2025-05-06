@@ -108,6 +108,11 @@
                 # cargo-lambda
               ]
               ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+            shellHook = ''
+              echo "Product Graph Console"
+              exec fish
+            '';
+
           };
         };
       }
