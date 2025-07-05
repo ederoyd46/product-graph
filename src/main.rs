@@ -17,7 +17,7 @@ async fn main() -> io::Result<()> {
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
-            .wrap(Cors::permissive()) //If you want to use Apollo Studio you need this
+            .wrap(Cors::permissive()) //If you want to use Apollo Studio, you need this
             .wrap(middleware::Logger::default())
             .configure(|config| graph::setup(config, context.clone()))
             .configure(echo::setup)
