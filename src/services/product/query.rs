@@ -15,12 +15,13 @@ pub async fn query_product(
         ))
     })?;
 
-    debug!("Product Found {:?}", result);
+    debug!("Product Found {result:?}");
 
     match result {
         Some(product) => Ok(product),
         None => Err(ApplicationError::NotFound),
     }
+
 }
 
 pub async fn query_products(
