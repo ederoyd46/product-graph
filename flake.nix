@@ -49,8 +49,7 @@
                 gnumake
                 cargo-zigbuild
                 rustSetup
-              ]
-              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
+              ];
 
             src = self;
 
@@ -75,7 +74,6 @@
 
           build = pkgs.rustPlatform.buildRustPackage {
             name = "product-graph";
-            buildInputs = pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.darwin.Security ];
             src = self;
             cargoLock = {
               lockFile = ./Cargo.lock;
